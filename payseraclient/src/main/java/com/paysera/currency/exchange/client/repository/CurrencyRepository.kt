@@ -9,7 +9,7 @@ import io.reactivex.schedulers.Schedulers
 /**
  * Created by eduardo.delito on 3/11/20.
  */
-interface PayseraRepository {
+interface CurrencyRepository {
 
     fun getRates()
 
@@ -18,7 +18,7 @@ interface PayseraRepository {
     fun getDate()
 }
 
-class PayseraRepositoryImpl(private val apiClient: PayseraApiClient, private val currencyDao: CurrencyDao) : PayseraRepository {
+class CurrencyRepositoryImpl(private val apiClient: PayseraApiClient, private val currencyDao: CurrencyDao) : CurrencyRepository {
 
     private var saveCurrencyDisposable : Disposable? = null
 

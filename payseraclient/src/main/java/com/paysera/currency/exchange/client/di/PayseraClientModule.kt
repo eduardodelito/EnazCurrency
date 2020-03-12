@@ -1,8 +1,8 @@
 package com.paysera.currency.exchange.client.di
 
 import com.paysera.currency.exchange.client.PayseraApiClient
-import com.paysera.currency.exchange.client.repository.PayseraRepository
-import com.paysera.currency.exchange.client.repository.PayseraRepositoryImpl
+import com.paysera.currency.exchange.client.repository.CurrencyRepository
+import com.paysera.currency.exchange.client.repository.CurrencyRepositoryImpl
 import com.paysera.currency.exchange.db.dao.CurrencyDao
 import dagger.Module
 import dagger.Provides
@@ -21,5 +21,5 @@ class PayseraClientModule {
 
     @Provides
     @Singleton
-    fun provideTrackRepository(apiClient: PayseraApiClient, trackDao: CurrencyDao): PayseraRepository = PayseraRepositoryImpl(apiClient, trackDao)
+    fun provideTrackRepository(apiClient: PayseraApiClient, trackDao: CurrencyDao): CurrencyRepository = CurrencyRepositoryImpl(apiClient, trackDao)
 }

@@ -1,6 +1,6 @@
 package com.paysera.currency.exchange.ui.viewmodel
 
-import com.paysera.currency.exchange.client.repository.PayseraRepository
+import com.paysera.currency.exchange.client.repository.CurrencyRepository
 import com.paysera.currency.exchange.common.viewmodel.BaseViewModel
 import javax.inject.Inject
 
@@ -8,7 +8,7 @@ import javax.inject.Inject
  * Created by eduardo.delito on 3/11/20.
  */
 class CurrencyViewModel @Inject constructor(
-    private val payseraRepository: PayseraRepository) : BaseViewModel() {
+    private val currencyRepository: CurrencyRepository) : BaseViewModel() {
 
     override fun onStart() {
         super.onStart()

@@ -1,7 +1,7 @@
 package com.paysera.currency.exchange.ui.di
 
 import androidx.lifecycle.ViewModel
-import com.paysera.currency.exchange.client.repository.PayseraRepository
+import com.paysera.currency.exchange.client.repository.CurrencyRepository
 import com.paysera.currency.exchange.common.viewmodel.ViewModelKey
 import com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel
 import dagger.Module
@@ -18,6 +18,6 @@ class CurrencyViewModelModule {
     @IntoMap
     @ViewModelKey(CurrencyViewModel::class)
     fun provideTrackListViewModel(
-        payseraRepository: PayseraRepository): ViewModel = CurrencyViewModel(payseraRepository)
+        currencyRepository: CurrencyRepository): ViewModel = CurrencyViewModel(currencyRepository)
 
 }
