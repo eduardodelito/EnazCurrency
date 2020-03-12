@@ -1,12 +1,7 @@
 package com.paysera.currency.exchange.client.repository
 
 import com.paysera.currency.exchange.client.PayseraApiClient
-import com.paysera.currency.exchange.client.model.PayseraResponse
-import com.paysera.currency.exchange.client.serviceModelToCurrencyEntity
-import com.paysera.currency.exchange.common.util.safeDispose
-import com.paysera.currency.exchange.db.dao.PayseraDao
-import com.paysera.currency.exchange.db.entity.CurrencyEntity
-import io.reactivex.Observable
+import com.paysera.currency.exchange.db.dao.CurrencyDao
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -23,7 +18,7 @@ interface PayseraRepository {
     fun getDate()
 }
 
-class PayseraRepositoryImpl(private val apiClient: PayseraApiClient, private val payseraDao: PayseraDao) : PayseraRepository {
+class PayseraRepositoryImpl(private val apiClient: PayseraApiClient, private val currencyDao: CurrencyDao) : PayseraRepository {
 
     private var saveCurrencyDisposable : Disposable? = null
 

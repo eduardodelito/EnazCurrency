@@ -1,7 +1,7 @@
 package com.paysera.currency.exchange.di.module
 
 import com.paysera.currency.exchange.MainActivity
-import com.paysera.currency.exchange.ui.di.CurrencyExchangeBindingModule
+import com.paysera.currency.exchange.ui.di.CurrencyBindingModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -13,7 +13,7 @@ abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector(
         modules = [
-            CurrencyExchangeBindingModule::class
+            CurrencyBindingModule::class
         ]
     )
     abstract fun bindMainActivity(): MainActivity

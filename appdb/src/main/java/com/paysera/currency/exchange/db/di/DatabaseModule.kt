@@ -3,7 +3,7 @@ package com.paysera.currency.exchange.db.di
 import android.app.Application
 import androidx.room.Room
 import com.paysera.currency.exchange.db.AppDatabase
-import com.paysera.currency.exchange.db.dao.PayseraDao
+import com.paysera.currency.exchange.db.dao.CurrencyDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -34,7 +34,7 @@ class DatabaseModule(private val mApplication: Application) {
 
     @Singleton
     @Provides
-    fun providesPayseraDao(appDatabase: AppDatabase): PayseraDao {
+    fun providesPayseraDao(appDatabase: AppDatabase): CurrencyDao {
         return appDatabase.payseraDao()
     }
 }

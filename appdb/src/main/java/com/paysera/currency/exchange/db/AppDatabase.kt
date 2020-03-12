@@ -2,7 +2,7 @@ package com.paysera.currency.exchange.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.paysera.currency.exchange.db.dao.PayseraDao
+import com.paysera.currency.exchange.db.dao.CurrencyDao
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
 
 /**
@@ -10,7 +10,7 @@ import com.paysera.currency.exchange.db.entity.CurrencyEntity
  */
 @Database(entities = [CurrencyEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun payseraDao(): PayseraDao
+    abstract fun payseraDao(): CurrencyDao
 
     companion object {
         const val DB_NAME = "DBPaysera"

@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.paysera.currency.exchange.ui.viewmodel.CurrentExchangeViewModel"/>
+            type="com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel"/>
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

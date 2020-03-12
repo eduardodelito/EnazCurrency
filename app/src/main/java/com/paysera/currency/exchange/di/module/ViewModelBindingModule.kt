@@ -2,7 +2,7 @@ package com.paysera.currency.exchange.di.module
 
 import androidx.lifecycle.ViewModelProvider
 import com.paysera.currency.exchange.common.viewmodel.ViewModelFactory
-import com.paysera.currency.exchange.ui.di.CurrencyExchangeBindingModule
+import com.paysera.currency.exchange.ui.di.CurrencyBindingModule
 import dagger.Binds
 import dagger.Module
 
@@ -11,7 +11,7 @@ import dagger.Module
  */
 @Module(
     includes = [
-        CurrencyExchangeBindingModule::class
+        CurrencyBindingModule::class
     ]
 )
 abstract class ViewModelBindingModule {

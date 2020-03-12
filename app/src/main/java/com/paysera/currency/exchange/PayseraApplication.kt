@@ -1,7 +1,6 @@
 package com.paysera.currency.exchange
 
 import androidx.multidex.MultiDex
-import com.paysera.currency.exchange.common.di.NetworkModule
 import com.paysera.currency.exchange.di.component.DaggerPayseraAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication

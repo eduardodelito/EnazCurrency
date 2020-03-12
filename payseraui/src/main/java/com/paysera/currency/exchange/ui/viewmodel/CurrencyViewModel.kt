@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Created by eduardo.delito on 3/11/20.
  */
-class CurrentExchangeViewModel @Inject constructor(
+class CurrencyViewModel @Inject constructor(
     private val payseraRepository: PayseraRepository) : BaseViewModel() {
 
     override fun onStart() {
