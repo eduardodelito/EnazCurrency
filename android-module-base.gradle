@@ -23,11 +23,11 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField 'String', 'BASE_HTTP_URL', '"https://api.exchangeratesapi.io/latest"'
+            buildConfigField 'String', 'BASE_HTTP_URL', '"https://api.exchangeratesapi.io/latest/"'
         }
         release {
             minifyEnabled false
-            buildConfigField 'String', 'BASE_HTTP_URL', '"https://api.exchangeratesapi.io/latest"'
+            buildConfigField 'String', 'BASE_HTTP_URL', '"https://api.exchangeratesapi.io/latest/"'
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

@@ -20,11 +20,11 @@ class CurrencyFragment: BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>
     override fun initData() {}
 
     override fun initViews() {
-        TODO("Not yet implemented")
+
     }
 
     override fun subscribeUi() {
-        TODO("Not yet implemented")
+        viewModel.getCurrencies()
     }
 
     companion object {

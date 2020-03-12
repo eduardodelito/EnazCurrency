@@ -8,8 +8,6 @@ import retrofit2.http.GET
  * Created by eduardo.delito on 3/11/20.
  */
 interface PayseraApiService {
-
     @GET("rates")
     fun getCurrencies(): Observable<PayseraResponse>
-
 }
