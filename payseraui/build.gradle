@@ -1,0 +1,19 @@
+import dependencies.Versions
+
+apply from: "$rootDir/android-module-base.gradle"
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    implementation project(':common')
+    implementation project(':payseraclient')
+    implementation project(':appdb')
+    implementation "androidx.legacy:legacy-support-v4:${Versions.legacySupport}"
+}
