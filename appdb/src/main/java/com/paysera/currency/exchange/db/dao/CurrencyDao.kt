@@ -1,6 +1,8 @@
 package com.paysera.currency.exchange.db.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
 import io.reactivex.Observable
@@ -12,4 +14,10 @@ import io.reactivex.Observable
 interface CurrencyDao {
     @Query("SELECT * FROM CurrencyEntity")
     fun getAllCurrencies(): Observable<List<CurrencyEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertCurrencies(currencyList: List<CurrencyEntity>)
+
+    @Query("DELETE FROM CurrencyEntity")
+    fun deleteCurrencies()
 }

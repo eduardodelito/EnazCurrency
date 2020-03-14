@@ -1,5 +1,6 @@
 package com.paysera.currency.exchange.client.di
 
+import android.content.Context
 import com.paysera.currency.exchange.client.PayseraApiClient
 import com.paysera.currency.exchange.client.repository.CurrencyRepository
 import com.paysera.currency.exchange.client.repository.CurrencyRepositoryImpl
@@ -13,7 +14,11 @@ import javax.inject.Singleton
  * Created by eduardo.delito on 3/11/20.
  */
 @Module
-class PayseraClientModule {
+class PayseraClientModule(private val context: Context) {
+
+    @Provides
+    @Singleton
+    fun provideContext() = context
 
     @Provides
     @Singleton
@@ -21,5 +26,5 @@ class PayseraClientModule {
 
     @Provides
     @Singleton
-    fun provideTrackRepository(apiClient: PayseraApiClient, trackDao: CurrencyDao): CurrencyRepository = CurrencyRepositoryImpl(apiClient, trackDao)
+    fun provideCurrencyRepository(apiClient: PayseraApiClient, currencyDao: CurrencyDao): CurrencyRepository = CurrencyRepositoryImpl(apiClient, currencyDao)
 }

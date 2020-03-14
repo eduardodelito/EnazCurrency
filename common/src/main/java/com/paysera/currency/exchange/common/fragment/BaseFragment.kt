@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.paysera.currency.exchange.common.viewmodel.BaseViewModel
@@ -99,5 +101,70 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
     override fun onStop() {
         super.onStop()
         viewModel.onStop()
+    }
+
+
+    fun showDialog(currencyLabel: TextView?, currencies: ArrayList<String>) {
+        var selected: String? = ""
+        val listItems = currencies.toTypedArray<CharSequence>()
+        val mBuilder = context?.let { AlertDialog.Builder(it) }
+        mBuilder?.setTitle("Choose Currencies")
+        mBuilder?.setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
+            dialogInterface.apply { selected = listItems[i].toString()}
+        }
+        mBuilder?.setPositiveButton("Ok") {dialog, which  ->
+            currencyLabel?.text = selected
+            dialog.cancel()
+            which.or(-1)
+        }
+        // Set the neutral/cancel button click listener
+        mBuilder?.setNegativeButton("Cancel") { dialog, which ->
+            // Do something when click the neutral button
+            dialog.cancel()
+            which.or(-2)
+        }
+        val mDialog = mBuilder?.create()
+        mDialog?.show()
+    }
+
+    abstract fun updateBalanceUI(currency: String?, amount: String?)
+
+    abstract fun message(convertedAmount: String?): String
+
+    fun submitDialog(currency: String?, amount: String?) {
+        val mBuilder = context?.let { AlertDialog.Builder(it) }
+        mBuilder?.setMessage("Are you sure you wan to convert?")
+        mBuilder?.setPositiveButton("Yes") {dialog, which  ->
+            confirmationDialog(message(amount))
+            updateBalanceUI(currency, amount)
+            dialog.cancel()
+            which.or(-1)
+        }
+        // Set the neutral/cancel button click listener
+        mBuilder?.setNegativeButton("No") { dialog, which ->
+            // Do something when click the neutral button
+            dialog.cancel()
+            which.or(-2)
+        }
+        val mDialog = mBuilder?.create()
+        mDialog?.show()
+    }
+
+    private fun confirmationDialog(message: String) {
+        val mBuilder = context?.let { AlertDialog.Builder(it) }
+        mBuilder?.setTitle("Currency Converted")
+        mBuilder?.setMessage(message)
+        mBuilder?.setPositiveButton("Ok") {dialog, which  ->
+            dialog.cancel()
+            which.or(-1)
+        }
+        // Set the neutral/cancel button click listener
+        mBuilder?.setNegativeButton("Cancel") { dialog, which ->
+            // Do something when click the neutral button
+            dialog.cancel()
+            which.or(-2)
+        }
+        val mDialog = mBuilder?.create()
+        mDialog?.show()
     }
 }

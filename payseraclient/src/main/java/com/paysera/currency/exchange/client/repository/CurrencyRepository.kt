@@ -2,7 +2,6 @@ package com.paysera.currency.exchange.client.repository
 
 import com.paysera.currency.exchange.client.PayseraApiClient
 import com.paysera.currency.exchange.client.model.PayseraResponse
-import com.paysera.currency.exchange.client.serviceModelToCurrencyEntity
 import com.paysera.currency.exchange.common.util.safeDispose
 import com.paysera.currency.exchange.db.dao.CurrencyDao
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
@@ -18,11 +17,9 @@ interface CurrencyRepository {
 
     fun getRates(): Observable<PayseraResponse>
 
-    fun saveCurrencies(currencies: List<CurrencyEntity>?)
+    fun saveCurrencies(rates: Any?, base: String?, date: String?)
 
-    fun getBase()
-
-    fun getDate()
+    fun insertCurrencies(currencyEntity: ArrayList<CurrencyEntity>)
 }
 
 class CurrencyRepositoryImpl(private val apiClient: PayseraApiClient, private val currencyDao: CurrencyDao) : CurrencyRepository {
@@ -34,24 +31,23 @@ class CurrencyRepositoryImpl(private val apiClient: PayseraApiClient, private va
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {
-                saveCurrencies(it?.results?.serviceModelToCurrencyEntity())
+                saveCurrencies(it?.rates, it?.base, it?.date)
             }
     }
 
-    override fun getBase() {
-        TODO("Not yet implemented")
-    }
-
-    override fun getDate() {
-        TODO("Not yet implemented")
-    }
-
-    override fun saveCurrencies(currencies: List<CurrencyEntity>?) {
+    override fun saveCurrencies(rates: Any?, base: String?, date: String?) {
         saveCurrencyDisposable = Observable.fromCallable {
-            currencies?.let { println(it) } }
+                rates?.let { rateList-> println("rateList     $rateList") }
+                base?.let { base-> println("base      $base") }
+                date?.let { date-> println("date       $date") }
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { saveCurrencyDisposable?.safeDispose() }
+    }
+
+    override fun insertCurrencies(currencyEntity: ArrayList<CurrencyEntity>) {
+        currencyDao.insertCurrencies(currencyEntity)
     }
 }
 

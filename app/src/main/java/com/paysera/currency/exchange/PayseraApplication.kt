@@ -19,10 +19,11 @@ class PayseraApplication : DaggerApplication() {
     }
 
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        val context = applicationContext
         return DaggerPayseraAppComponent
             .builder()
             .application(this)
-            .payseraClient(PayseraClientModule())
+            .payseraClient(PayseraClientModule(context))
             .database(DatabaseModule(this))
             .networkModule(NetworkModule())
             .build()
