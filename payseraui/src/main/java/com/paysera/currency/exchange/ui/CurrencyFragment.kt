@@ -61,7 +61,7 @@ class CurrencyFragment: BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>
             })
 
             balanceResult.observe(viewLifecycleOwner, Observer { result ->
-                balancesAdapter.addDataSet(result)
+                balancesAdapter.addItemData(result)
             })
         }
     }

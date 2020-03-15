@@ -31,8 +31,8 @@ class CurrencyViewModel @Inject constructor(private val applicationContext: Cont
     private val _errorMessage = MutableLiveData<Int?>()
     val errorMessage: LiveData<Int?> get() = _errorMessage
 
-    private val _balanceListResult = MutableLiveData<List<BalanceItem>>()
-    val balanceListResult: LiveData<List<BalanceItem>> get() = _balanceListResult
+    private val _balanceListResult = MutableLiveData<MutableList<BalanceItem>>()
+    val balanceListResult: LiveData<MutableList<BalanceItem>> get() = _balanceListResult
 
     private val _balanceResult = MutableLiveData<BalanceItem>()
     val balanceResult: LiveData<BalanceItem> get() = _balanceResult
@@ -80,47 +80,4 @@ class CurrencyViewModel @Inject constructor(private val applicationContext: Cont
                 }
             )
     }
-
-//    fun getSaveCurrencies() {
-//        balancesDBDisposable = currencyRepository.getSaveCurrencies()
-//            .subscribe(
-//                { result ->
-//                    _balanceListResult.postValue(result.entityModelToCurrencyItem())
-//                    balancesDBDisposable?.safeDispose()
-//                },
-//                {
-//                    _errorMessage.postValue(R.string.error_database)
-//                    balancesDBDisposable?.safeDispose()
-//                }
-//            )
-//    }
-
-//    fun jsonCurrency(): JSONObject {
-//        val jsonFileString = getJsonDataFromAsset(applicationContext, "currency.json")
-//        return JSONObject(jsonFileString.toString())
-//    }
-
-//    fun loadCurrencies() {
-//        val jsonObject = jsonCurrency();
-//        val jObject = JSONObject(jsonObject.getString("rates"))
-//        val keys: Iterator<String> = jObject.keys()
-//        jsonObject.getString("base").let { currencies.add(it) }
-//        while (keys.hasNext()) {
-//            val key = keys.next()
-//            currencies.add(key)
-//            balanceItemList.add(BalanceItem(key, jObject.getString(key)))
-//        }
-//
-//    }
-//
-//    private fun getJsonDataFromAsset(context: Context, fileName: String): String? {
-//        val jsonString: String
-//        try {
-//            jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
-//        } catch (ioException: IOException) {
-//            ioException.printStackTrace()
-//            return null
-//        }
-//        return jsonString
-//    }
 }

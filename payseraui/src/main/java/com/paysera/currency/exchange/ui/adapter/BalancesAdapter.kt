@@ -13,7 +13,7 @@ import com.paysera.currency.exchange.ui.model.BalanceItem
  */
 class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
 
-    private var list: List<BalanceItem> = ArrayList()
+    private var list: MutableList<BalanceItem> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding: ItemBalanceBinding =
@@ -35,18 +35,19 @@ class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
      *
      * @param list the new set of data
      */
-    fun updateDataSet(list: List<BalanceItem>) {
+    fun updateDataSet(list: MutableList<BalanceItem>) {
         this.list = list
+        this.list.reverse()
         notifyDataSetChanged()
     }
 
     /**
-     * Function to update the track item list data
+     * Function to add an item into the list.
      *
-     * @param list the new set of data
+     * @param balanceItem item data
      */
-    fun addDataSet(balanceItem: BalanceItem) {
-        this.list.plus(balanceItem).asReversed()
+    fun addItemData(balanceItem: BalanceItem) {
+        this.list.add(0, balanceItem)
         notifyDataSetChanged()
     }
 

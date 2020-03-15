@@ -19,11 +19,11 @@ fun List<CurrencyRatesResult>.entityModelToCurrencyItem(): List<CurrencyEntity> 
     }
 }
 
-fun List<BalanceEntity>.entityModelToBalanceItem(): List<BalanceItem> {
+fun MutableList<BalanceEntity>.entityModelToBalanceItem(): MutableList<BalanceItem> {
     return this.map {
         BalanceItem(
             currency = it.currency,
             amount = it.amount
         )
-    }
+    }.toMutableList()
 }

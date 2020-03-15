@@ -33,7 +33,7 @@ interface CurrencyDao {
     fun deleteBaseAndDate()
 
     @Query("SELECT * FROM BalanceEntity")
-    fun getAllBalances(): Observable<List<BalanceEntity>>
+    fun getAllBalances(): Observable<MutableList<BalanceEntity>>
 
     @Query("SELECT * FROM BalanceEntity")
     fun getBalanceEntity(): BalanceEntity

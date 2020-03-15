@@ -32,7 +32,7 @@ interface CurrencyRepository {
 
     fun saveBalance(currency: String?, amount: String?)
 
-    fun getSaveBalances(): Observable<List<BalanceEntity>>
+    fun getSaveBalances(): Observable<MutableList<BalanceEntity>>
 }
 
 class CurrencyRepositoryImpl(
@@ -98,7 +98,7 @@ class CurrencyRepositoryImpl(
             .subscribe { saveBalanceDisposable?.safeDispose() }
     }
 
-    override fun getSaveBalances(): Observable<List<BalanceEntity>> {
+    override fun getSaveBalances(): Observable<MutableList<BalanceEntity>> {
         return currencyDao.getAllBalances()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
