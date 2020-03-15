@@ -13,5 +13,7 @@ data class BaseAndDateEntity(
     var id: Int,
 
     @ColumnInfo(name = "base") var base: String?,
-    @ColumnInfo(name = "date") var date: String?
+    @ColumnInfo(name = "date") var date: String?,
+    @ColumnInfo(name = "currentBalance") var currentBalance: String?,
+    @ColumnInfo(name = "commissionFee") var commissionFee: String?
 )

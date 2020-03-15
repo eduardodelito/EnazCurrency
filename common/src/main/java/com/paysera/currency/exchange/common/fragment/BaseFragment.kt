@@ -103,17 +103,18 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         viewModel.onStop()
     }
 
+    abstract fun updateReceiveUI(selected: String?, isReceive: Boolean)
 
-    fun showDialog(currencyLabel: TextView?, currencies: ArrayList<String>) {
+    fun showDialog(currencies: ArrayList<String?>, isReceive: Boolean) {
         var selected: String? = ""
-        val listItems = currencies.toTypedArray<CharSequence>()
+        val listItems = currencies.toTypedArray<CharSequence?>()
         val mBuilder = context?.let { AlertDialog.Builder(it) }
         mBuilder?.setTitle("Choose Currencies")
         mBuilder?.setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
             dialogInterface.apply { selected = listItems[i].toString()}
         }
         mBuilder?.setPositiveButton("Ok") {dialog, which  ->
-            currencyLabel?.text = selected
+            updateReceiveUI(selected, isReceive)
             dialog.cancel()
             which.or(-1)
         }
@@ -127,16 +128,14 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         mDialog?.show()
     }
 
-    abstract fun updateBalanceUI(currency: String?, amount: String?)
+    abstract fun updateBalanceUI()
 
-    abstract fun message(convertedAmount: String?): String
-
-    fun submitDialog(currency: String?, amount: String?) {
+    fun submitDialog(message: String?) {
         val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setMessage("Are you sure you wan to convert?")
+        mBuilder?.setMessage("Are you sure you want to convert $message?")
         mBuilder?.setPositiveButton("Yes") {dialog, which  ->
-            confirmationDialog(message(amount))
-            updateBalanceUI(currency, amount)
+            confirmationDialog(message)
+            updateBalanceUI()
             dialog.cancel()
             which.or(-1)
         }
@@ -150,10 +149,10 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         mDialog?.show()
     }
 
-    private fun confirmationDialog(message: String) {
+    private fun confirmationDialog(message: String?) {
         val mBuilder = context?.let { AlertDialog.Builder(it) }
         mBuilder?.setTitle("Currency Converted")
-        mBuilder?.setMessage(message)
+        mBuilder?.setMessage("You have converted  $message.")
         mBuilder?.setPositiveButton("Ok") {dialog, which  ->
             dialog.cancel()
             which.or(-1)

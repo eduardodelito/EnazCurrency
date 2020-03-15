@@ -8,7 +8,7 @@ import com.paysera.currency.exchange.db.entity.CurrencyEntity
 /**
  * Created by eduardo.delito on 3/12/20.
  */
-fun List<CurrencyRatesResult>.serviceModelToCurrencyEntity() : List<CurrencyEntity> {
+fun List<CurrencyRatesResult>.serviceModelToCurrencyEntity(): List<CurrencyEntity> {
     return this.map {
         CurrencyEntity(
             id = 0,
@@ -18,6 +18,12 @@ fun List<CurrencyRatesResult>.serviceModelToCurrencyEntity() : List<CurrencyEnti
     }
 }
 
-fun BaseAndDateResult.serviceModelToBaseAndDateEntity() : BaseAndDateEntity {
-    return BaseAndDateEntity(id = 0, base = base, date = date)
+fun BaseAndDateResult.serviceModelToBaseAndDateEntity(): BaseAndDateEntity {
+    return BaseAndDateEntity(
+        id = 0,
+        base = base,
+        date = date,
+        currentBalance = currentBance,
+        commissionFee = commissionFee
+    )
 }

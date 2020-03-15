@@ -2,4 +2,7 @@
 <resources>
     <string name="error_network_connection">Network Connection Problem.</string>
     <string name="error_database">Local Database Problem.</string>
+    <string name="error_conversion">Conversion Problem.</string>
+
+    <string name="success_message">Conversion list updated.</string>
 </resources>

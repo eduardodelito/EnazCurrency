@@ -18,7 +18,6 @@ class CurrencyViewModelModule {
     @Provides
     @IntoMap
     @ViewModelKey(CurrencyViewModel::class)
-    fun provideTrackListViewModel(applicationContext: Context,
-        currencyRepository: CurrencyRepository): ViewModel = CurrencyViewModel(applicationContext, currencyRepository)
+    fun provideTrackListViewModel(currencyRepository: CurrencyRepository): ViewModel = CurrencyViewModel(currencyRepository)
 
 }

@@ -24,7 +24,9 @@ import org.json.JSONObject
  */
 interface CurrencyRepository {
 
-    fun getCurrencies(): Observable<PayseraResponse>
+    fun getCurrencies(): ArrayList<String?>
+
+    fun getPayseraResponse(): Observable<PayseraResponse>
 
     fun saveCurrencies(rates: Any?, base: String?, date: String?)
 
@@ -33,6 +35,14 @@ interface CurrencyRepository {
     fun saveBalance(currency: String?, amount: String?)
 
     fun getSaveBalances(): Observable<MutableList<BalanceEntity>>
+
+    fun getBase(): Observable<BaseAndDateEntity>
+
+    fun getCurrencyValue(currency: String?): Observable<CurrencyEntity>
+
+    fun getCurrencyBalance(currency: String?): Observable<BalanceEntity>
+
+    fun updateDefaultBalance(base: String?, currentBalance: String?)
 }
 
 class CurrencyRepositoryImpl(
@@ -42,8 +52,14 @@ class CurrencyRepositoryImpl(
 
     private var saveCurrencyDisposable: Disposable? = null
     private var saveBalanceDisposable: Disposable? = null
+    private var saveDefaultBalanceDisposable: Disposable? = null
+    private var currencies = ArrayList<String?>()
 
-    override fun getCurrencies(): Observable<PayseraResponse> {
+    override fun getCurrencies(): ArrayList<String?> {
+        return currencies;
+    }
+
+    override fun getPayseraResponse(): Observable<PayseraResponse> {
         return apiClient.getService().getCurrencies()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -59,17 +75,20 @@ class CurrencyRepositoryImpl(
                     val jObject = JSONObject(rateList.toString())
                     val keys: Iterator<String> = jObject.keys()
                     var currencyList = ArrayList<CurrencyRatesResult>()
+                    currencies.add(base)
                     while (keys.hasNext()) {
                         val key = keys.next()
+                        currencies.add(key)
                         currencyList.add(CurrencyRatesResult(key, jObject.getString(key)))
                     }
                     currencyDao.insertCurrencies(currencyList.serviceModelToCurrencyEntity())
                 }
-                currencyDao.deleteBaseAndDate()
                 currencyDao.insertBaseAndDate(
                     BaseAndDateResult(
                         base,
-                        date
+                        date,
+                        "1000", // Should be in the service response
+                        "0.7" // Should be in the service response
                     ).serviceModelToBaseAndDateEntity()
                 )
             }
@@ -86,6 +105,8 @@ class CurrencyRepositoryImpl(
 
     override fun saveBalance(currency: String?, amount: String?) {
         saveBalanceDisposable = Observable.fromCallable {
+
+
                 currencyDao.insertBalanceEntity(
                     BalanceResult(
                         currency,
@@ -101,6 +122,36 @@ class CurrencyRepositoryImpl(
     override fun getSaveBalances(): Observable<MutableList<BalanceEntity>> {
         return currencyDao.getAllBalances()
             .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun getBase(): Observable<BaseAndDateEntity> {
+        return currencyDao.getBaseAndDateEntity()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    override fun getCurrencyValue(currency: String?): Observable<CurrencyEntity> {
+        return currencyDao.findCurrencyEntity(currency).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     *  Load base for the current balance
+     *  @param base EUR value
+     *  @param currentBalance default balance
+     */
+    override fun updateDefaultBalance(base: String?, currentBalance: String?) {
+        saveDefaultBalanceDisposable = Observable.fromCallable {
+                currencyDao.updateBaseAndDate(base, currentBalance)
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { saveDefaultBalanceDisposable?.safeDispose() }
+    }
+
+    override fun getCurrencyBalance(currency: String?): Observable<BalanceEntity> {
+        return currencyDao.findBalanceEntity(currency).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
 }

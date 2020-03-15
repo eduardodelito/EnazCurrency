@@ -39,7 +39,7 @@
             <LinearLayout
                 android:id="@+id/my_balance_account_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="80dp"
+                android:layout_height="100dp"
                 android:orientation="vertical"
                 android:paddingRight="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"

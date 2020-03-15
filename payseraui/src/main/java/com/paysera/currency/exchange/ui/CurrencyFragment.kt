@@ -26,8 +26,9 @@ class CurrencyFragment: BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>
 
     override fun initData() {
         with(viewModel) {
-            getCurrencies()
+            getPayseraResponse()
             getBalances()
+            defaultBalance()
         }
     }
 
@@ -40,13 +41,13 @@ class CurrencyFragment: BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>
         }
 
         drop_down_image.setOnClickListener {
-            showDialog(currency_lbl, viewModel.currencies)
+            showDialog(viewModel.currencies, false)
         }
         drop_down_receive_image.setOnClickListener {
-            showDialog(currency_receive_lbl, viewModel.currencies)
+            showDialog(viewModel.currencies, true)
         }
         submit_button.setOnClickListener {
-            submitDialog(currency_receive_lbl.text.toString(), sell_field.text.toString())
+            viewModel.computeInitialConvertedBalance(currency_lbl.text.toString(), currency_receive_lbl.text.toString(), sell_field.text.toString());
         }
     }
 
@@ -56,23 +57,37 @@ class CurrencyFragment: BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>
                 Toast.makeText(context, messageId?.let { getString(it) }, Toast.LENGTH_LONG).show()
             })
 
+            dialogMessage.observe(viewLifecycleOwner, Observer { message ->
+                submitDialog(message)
+            })
+
             balanceListResult.observe(viewLifecycleOwner, Observer { result ->
                 balancesAdapter.updateDataSet(result)
             })
 
             balanceResult.observe(viewLifecycleOwner, Observer { result ->
                 balancesAdapter.addItemData(result)
+                receive_text.text = "+ ${result.amount}"
+            })
+
+            currentBalance.observe(viewLifecycleOwner, Observer { result ->
+                amount_txt_lbl.text = result
+                updateDefaultBalance(result)
             })
         }
     }
 
-    override fun updateBalanceUI(currency: String?, amount: String?) {
-        viewModel.updateBalanceUI(currency, amount)
+    override fun updateReceiveUI(selected: String?, isReceive: Boolean) {
+        if (isReceive) {
+            currency_receive_lbl?.text = selected
+            receive_text.text = "+ 0"
+        } else {
+            currency_lbl.text = selected
+        }
     }
 
-    override fun message(convertedAmount: String?): String {
-        return "You have converted ${sell_field.text} ${currency_lbl.text} to " +
-                "$convertedAmount ${currency_receive_lbl.text}. Commission Fee - 0.70"
+    override fun updateBalanceUI() {
+        viewModel.computeConvertedBalance(currency_receive_lbl.text.toString(), sell_field.text.toString())
     }
 
     companion object {
