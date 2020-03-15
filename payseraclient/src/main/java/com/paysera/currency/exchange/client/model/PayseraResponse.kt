@@ -5,4 +5,6 @@ package com.paysera.currency.exchange.client.model
  */
 data class PayseraResponse(val rates: Any?, val base: String?, val date: String?)
 
-data class CurrencyRatesResult (val countryCode : String?, val currencyAmount : String?)
+data class CurrencyRatesResult (val currency : String?, val currencyValue : String?)
+
+data class BaseAndDateResult (val base : String?, val date : String?)

@@ -1,5 +1,6 @@
 package com.paysera.currency.exchange.ui
 
+import android.widget.Toast
 import com.paysera.currency.exchange.common.fragment.BaseFragment
 import com.paysera.currency.exchange.ui.adapter.BalancesAdapter
 import com.paysera.currency.exchange.ui.databinding.CurrencyFragmentBinding
@@ -7,7 +8,6 @@ import com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel
 import kotlinx.android.synthetic.main.currency_fragment.*
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.paysera.currency.exchange.ui.model.BalanceItem
 import javax.inject.Inject
 
 /**
@@ -25,8 +25,10 @@ class CurrencyFragment: BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>
     private lateinit var balancesAdapter: BalancesAdapter
 
     override fun initData() {
-        viewModel.getCurrencies()
-        viewModel.loadCurrencies()
+        with(viewModel) {
+            getCurrencies()
+            getBalances()
+        }
     }
 
     override fun initViews() {
@@ -50,15 +52,22 @@ class CurrencyFragment: BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>
 
     override fun subscribeUi() {
         with (viewModel) {
-            _balanceResult.observe(viewLifecycleOwner, Observer { result ->
+            errorMessage.observe(viewLifecycleOwner, Observer { messageId ->
+                Toast.makeText(context, messageId?.let { getString(it) }, Toast.LENGTH_LONG).show()
+            })
+
+            balanceListResult.observe(viewLifecycleOwner, Observer { result ->
+                balancesAdapter.updateDataSet(result)
+            })
+
+            balanceResult.observe(viewLifecycleOwner, Observer { result ->
                 balancesAdapter.addDataSet(result)
             })
         }
     }
 
     override fun updateBalanceUI(currency: String?, amount: String?) {
-        viewModel._balanceResult.postValue(BalanceItem(currency, amount))
-        receive_text.text = "+ $amount"
+        viewModel.updateBalanceUI(currency, amount)
     }
 
     override fun message(convertedAmount: String?): String {
