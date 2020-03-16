@@ -57,6 +57,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
                 currency_receive_lbl.text.toString(),
                 amount_txt_lbl.text.toString(),
                 sell_field.text.toString()
+                , true
             )
         }
     }
@@ -88,6 +89,10 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
                 if (result.isNotEmpty())
                     balancesAdapter.updateDataSet(result)
             })
+
+            dialogMessage.observe(viewLifecycleOwner, Observer { message ->
+                submitDialog(message)
+            })
         }
     }
 
@@ -101,7 +106,13 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     }
 
     override fun updateBalanceUI() {
-//        viewModel.computeConvertedBalance(currency_receive_lbl.text.toString(), sell_field.text.toString())
+        viewModel.computeConvertedBalance(
+            currency_lbl.text.toString(),
+            currency_receive_lbl.text.toString(),
+            amount_txt_lbl.text.toString(),
+            sell_field.text.toString()
+            , false
+        )
     }
 
     companion object {

@@ -74,7 +74,7 @@ class CurrencyRepositoryImpl(
                 CurrencyRatesResult(
                     key,
                     jObject.getString(key),
-                    "",
+                    "0",
                     false,
                     false
                 )

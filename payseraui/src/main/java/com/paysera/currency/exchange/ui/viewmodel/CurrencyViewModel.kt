@@ -43,9 +43,6 @@ class CurrencyViewModel @Inject constructor(
     private val _balanceListResult = MutableLiveData<MutableList<BalanceItem>>()
     val balanceListResult: LiveData<MutableList<BalanceItem>> get() = _balanceListResult
 
-    private val _balanceResult = MutableLiveData<BalanceItem>()
-    val balanceResult: LiveData<BalanceItem> get() = _balanceResult
-
     private val _currencyBalance = MutableLiveData<String>()
     val currencyBalance: LiveData<String> get() = _currencyBalance
 
@@ -82,7 +79,8 @@ class CurrencyViewModel @Inject constructor(
         fromCurrency: String?,
         toCurrency: String?,
         fromBalance: String?,
-        amount: String?
+        amount: String?,
+        initial: Boolean
     ) {
 
         val amountBal: Double = amount?.toDoubleOrNull() ?: 0.0
@@ -108,29 +106,40 @@ class CurrencyViewModel @Inject constructor(
 
                         val totalBaseBalance =
                             amountBal.let { baseBalance?.currencyBalance?.toDouble()?.minus(it) }
-                        // Update DB for base currency.
-                        currencyRepository.updateFromCurrencyEntity(
-                            fromCurrency,
-                            totalBaseBalance?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString(),
-                            true
-                        )
 
                         val selectedCurrBal = result.find { currencyEntity: CurrencyEntity ->
                             currencyEntity.currency.equals(toCurrency)
                         }
 
-                        val total =
+                        val subTotal =
                             selectedCurrBal?.currencyValue?.toDouble()?.let {
                                 amountBal.times(
                                     it
                                 )
                             }
-                        // Update DB for the converted currency.
-                        currencyRepository.updateToCurrencyEntity(
-                            toCurrency,
-                            total?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString(),
-                            true
-                        )
+
+                        if (initial) {
+                            _dialogMessage.postValue(
+                                "From ${convertDoubleToBigDecimal(amountBal)} $fromCurrency to ${convertDoubleToBigDecimal(
+                                    subTotal
+                                )} $toCurrency"
+                            )
+                        } else {
+
+                            // Update DB for base currency.
+                            currencyRepository.updateFromCurrencyEntity(
+                                fromCurrency,
+                                convertDoubleToBigDecimal(totalBaseBalance), true
+                            )
+
+                            val total = subTotal?.plus(selectedCurrBal.currencyBalance?.toDouble() ?: 0.0)
+                            println(total)
+
+                            // Update DB for the converted currency.
+                            currencyRepository.updateToCurrencyEntity(
+                                toCurrency, convertDoubleToBigDecimal(total), true
+                            )
+                        }
                     }
                     computeDisposable?.safeDispose()
                 },
@@ -139,6 +148,10 @@ class CurrencyViewModel @Inject constructor(
                     computeDisposable?.safeDispose()
                     _isComputing.postValue(false)
                 })
+    }
+
+    private fun convertDoubleToBigDecimal(amount: Double?): String {
+        return amount?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString()
     }
 
     fun updateUI() {
