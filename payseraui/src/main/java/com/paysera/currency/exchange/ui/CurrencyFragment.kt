@@ -69,19 +69,11 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             })
 
             isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-                if (isLoading) progressBar.dialog.show() else progressBar.dialog.hide()
+                if (!isLoading) progressBar.dialog.hide()
             })
 
             isComputing.observe(viewLifecycleOwner, Observer { isComputing ->
-                if (isComputing) progressBar.dialog.show()
-                else {
-                    progressBar.dialog.hide()
-                    updateUI()
-                }
-            })
-
-            isUpdating.observe(viewLifecycleOwner, Observer { isUpdating ->
-                if (isUpdating) progressBar.dialog.show() else progressBar.dialog.hide()
+                if (!isComputing) updateUI()
             })
 
             currencies.observe(viewLifecycleOwner, Observer { result ->
@@ -93,7 +85,8 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             })
 
             balanceListResult.observe(viewLifecycleOwner, Observer { result ->
-                balancesAdapter.updateDataSet(result)
+                if (result.isNotEmpty())
+                    balancesAdapter.updateDataSet(result)
             })
         }
     }

@@ -24,7 +24,9 @@ interface CurrencyRepository {
 
     fun queryCurrencies(): Observable<List<CurrencyEntity>>
 
-    fun updateCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean)
+    fun updateFromCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean)
+
+    fun updateToCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean)
 
 }
 
@@ -34,7 +36,8 @@ class CurrencyRepositoryImpl(
 ) : CurrencyRepository {
 
     private var saveCurrencyDisposable: Disposable? = null
-    private var updateCurrencyDisposable: Disposable? = null
+    private var updateFromCurrencyDisposable: Disposable? = null
+    private var updateToCurrencyDisposable: Disposable? = null
 
     override fun getPayseraResponse(): Observable<PayseraResponse> {
         return apiClient.getService().getCurrencies()
@@ -80,14 +83,24 @@ class CurrencyRepositoryImpl(
         return currencyList
     }
 
-    override fun updateCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean) {
-        updateCurrencyDisposable = Observable.fromCallable {
+    override fun updateToCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean) {
+        updateToCurrencyDisposable = Observable.fromCallable {
                 currencyDao.updateCurrencyEntity(currency, amount, isAvailable)
-                updateCurrencyDisposable.safeDispose()
+                updateToCurrencyDisposable.safeDispose()
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { updateCurrencyDisposable?.safeDispose() }
+            .subscribe { updateToCurrencyDisposable?.safeDispose() }
+    }
+
+    override fun updateFromCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean) {
+        updateFromCurrencyDisposable = Observable.fromCallable {
+                currencyDao.updateCurrencyEntity(currency, amount, isAvailable)
+                updateFromCurrencyDisposable.safeDispose()
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { updateFromCurrencyDisposable?.safeDispose() }
     }
 
     override fun queryCurrencies(): Observable<List<CurrencyEntity>> {

@@ -25,14 +25,11 @@ class CurrencyViewModel @Inject constructor(
     private var computeDisposable: Disposable? = null
     private var updateDisposable: Disposable? = null
 
-    private val _isLoading = MutableLiveData<Boolean>(false)
+    private val _isLoading = MutableLiveData<Boolean>(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _isComputing = MutableLiveData<Boolean>(false)
+    private val _isComputing = MutableLiveData<Boolean>(true)
     val isComputing: LiveData<Boolean> get() = _isComputing
-
-    private val _isUpdating = MutableLiveData<Boolean>(false)
-    val isUpdating: LiveData<Boolean> get() = _isUpdating
 
     private val _currencies = MutableLiveData<ArrayList<String?>>()
     val currencies: LiveData<ArrayList<String?>> get() = _currencies
@@ -53,7 +50,6 @@ class CurrencyViewModel @Inject constructor(
     val currencyBalance: LiveData<String> get() = _currencyBalance
 
     fun getPayseraResponse() {
-        _isLoading.postValue(true)
         payseraResponseDisposable = currencyRepository.getPayseraResponse().subscribe(
             { result ->
                 currencyRepository.saveCurrencies(result.rates, result.base)
@@ -61,7 +57,6 @@ class CurrencyViewModel @Inject constructor(
             },
             {
                 _errorMessage.postValue(R.string.error_network_connection)
-                _isLoading.postValue(false)
                 payseraResponseDisposable?.safeDispose()
             }
         )
@@ -114,7 +109,11 @@ class CurrencyViewModel @Inject constructor(
                         val totalBaseBalance =
                             amountBal.let { baseBalance?.currencyBalance?.toDouble()?.minus(it) }
                         // Update DB for base currency.
-                        updateDB(toCurrency, totalBaseBalance, true)
+                        currencyRepository.updateFromCurrencyEntity(
+                            fromCurrency,
+                            totalBaseBalance?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString(),
+                            true
+                        )
 
                         val selectedCurrBal = result.find { currencyEntity: CurrencyEntity ->
                             currencyEntity.currency.equals(toCurrency)
@@ -127,7 +126,11 @@ class CurrencyViewModel @Inject constructor(
                                 )
                             }
                         // Update DB for the converted currency.
-                        updateDB(toCurrency, total, true)
+                        currencyRepository.updateToCurrencyEntity(
+                            toCurrency,
+                            total?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString(),
+                            true
+                        )
                     }
                     computeDisposable?.safeDispose()
                 },
@@ -138,26 +141,13 @@ class CurrencyViewModel @Inject constructor(
                 })
     }
 
-    private fun updateDB(currency: String?, total: Double?, isAvailable: Boolean) {
-        currencyRepository.updateCurrencyEntity(
-            currency,
-            total?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString(),
-            isAvailable
-        )
-    }
-
     fun updateUI() {
-        _isUpdating.postValue(true)
         updateDisposable = currencyRepository.queryCurrencies()
-            .doFinally {
-                _isUpdating.postValue(false)
-            }
             .subscribe({ result ->
                 parseBalanceList(result, true)
                 updateDisposable?.safeDispose()
             }, {
                 _errorMessage.postValue(R.string.error_database)
-                _isUpdating.postValue(false)
                 updateDisposable?.safeDispose()
             })
     }
