@@ -28,6 +28,7 @@ class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.binding.item = list[position]
         holder.binding.executePendingBindings()
+        holder.binding.amountTxtLbl.text = list[position].amount
     }
 
     /**
@@ -35,9 +36,9 @@ class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
      *
      * @param list the new set of data
      */
-    fun updateDataSet(list: MutableList<BalanceItem>) {
-        this.list = list
-        this.list.reverse()
+    fun updateDataSet(newList: MutableList<BalanceItem>) {
+        this.list.clear()
+        this.list.addAll(newList)
         notifyDataSetChanged()
     }
 
@@ -48,6 +49,16 @@ class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
      */
     fun addItemData(balanceItem: BalanceItem) {
         this.list.add(0, balanceItem)
+        notifyItemInserted(0)
+    }
+
+    /**
+     * Function to update an item into the list.
+     *
+     * @param balanceItem item data
+     */
+    fun updateItemData(balanceItem: BalanceItem) {
+        this.list.indexOf(balanceItem)
         notifyDataSetChanged()
     }
 

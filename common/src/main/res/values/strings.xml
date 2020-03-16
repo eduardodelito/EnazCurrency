@@ -5,4 +5,6 @@
     <string name="error_conversion">Conversion Problem.</string>
 
     <string name="success_message">Conversion list updated.</string>
+    <string name="currencies_message">Currencies loaded successfully.</string>
+    <string name="invalid_message">Invalid amount.</string>
 </resources>

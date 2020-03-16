@@ -15,5 +15,8 @@ data class CurrencyEntity (
     var id: Int,
 
     @ColumnInfo(name = "currency") var currency: String?,
-    @ColumnInfo(name = "currencyValue") var currencyValue: String?
+    @ColumnInfo(name = "currencyValue") var currencyValue: String?,
+    @ColumnInfo(name = "currencyBalance") var currencyBalance: String?,
+    @ColumnInfo(name = "isAvailable") var isAvailable: Boolean,
+    @ColumnInfo(name = "isBase") var isBase: Boolean
 )

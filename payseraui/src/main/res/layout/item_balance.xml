@@ -47,7 +47,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="@{item.amount}"
                     android:textColor="@color/design_default_color_on_secondary" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

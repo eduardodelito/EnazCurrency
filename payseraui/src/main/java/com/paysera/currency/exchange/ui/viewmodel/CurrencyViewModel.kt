@@ -1,20 +1,14 @@
 package com.paysera.currency.exchange.ui.viewmodel
 
-import android.content.Context
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.paysera.currency.exchange.client.repository.CurrencyRepository
 import com.paysera.currency.exchange.common.util.safeDispose
 import com.paysera.currency.exchange.common.viewmodel.BaseViewModel
+import com.paysera.currency.exchange.db.entity.CurrencyEntity
 import com.paysera.currency.exchange.ui.R
 import com.paysera.currency.exchange.ui.model.BalanceItem
-import com.paysera.currency.exchange.ui.util.entityModelToBalanceItem
 import io.reactivex.disposables.Disposable
-import org.json.JSONObject
-import java.io.IOException
-import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
 
@@ -26,14 +20,22 @@ class CurrencyViewModel @Inject constructor(
     private val currencyRepository: CurrencyRepository
 ) : BaseViewModel() {
 
+    private var payseraResponseDisposable: Disposable? = null
     private var currenciesDisposable: Disposable? = null
-    private var balancesDBDisposable: Disposable? = null
-    private var baseDisposable: Disposable? = null
-    private var currencyValueDisposable: Disposable? = null
-    private var currencyInitialValueDisposable: Disposable? = null
-    private var currencyIfExistDisposable: Disposable? = null
+    private var computeDisposable: Disposable? = null
+    private var updateDisposable: Disposable? = null
 
-    var currencies = ArrayList<String?>()
+    private val _isLoading = MutableLiveData<Boolean>(false)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _isComputing = MutableLiveData<Boolean>(false)
+    val isComputing: LiveData<Boolean> get() = _isComputing
+
+    private val _isUpdating = MutableLiveData<Boolean>(false)
+    val isUpdating: LiveData<Boolean> get() = _isUpdating
+
+    private val _currencies = MutableLiveData<ArrayList<String?>>()
+    val currencies: LiveData<ArrayList<String?>> get() = _currencies
 
     private val _errorMessage = MutableLiveData<Int?>()
     val errorMessage: LiveData<Int?> get() = _errorMessage
@@ -47,132 +49,135 @@ class CurrencyViewModel @Inject constructor(
     private val _balanceResult = MutableLiveData<BalanceItem>()
     val balanceResult: LiveData<BalanceItem> get() = _balanceResult
 
-    private val _currentBalance = MutableLiveData<String>()
-    val currentBalance: LiveData<String> get() = _currentBalance
-
-    private var defaultCurrentBalance: Double? = 0.0
-    private var defaultCommissionFee: Double? = 0.0
-    private var defaultBase: String? = ""
-    private var defaultDate: String? = ""
+    private val _currencyBalance = MutableLiveData<String>()
+    val currencyBalance: LiveData<String> get() = _currencyBalance
 
     fun getPayseraResponse() {
-        currenciesDisposable = currencyRepository.getPayseraResponse()
-            .doFinally { currencies = currencyRepository.getCurrencies() }.subscribe(
-                {
-                    _errorMessage.postValue(R.string.success_message)
-                    currenciesDisposable?.safeDispose()
-                },
-                {
-                    _errorMessage.postValue(R.string.error_database)
-                    currenciesDisposable?.safeDispose()
-                }
-            )
-    }
-
-    fun computeInitialConvertedBalance(baseCurrency: String?, currency: String?, amount: String?) {
-        currencyInitialValueDisposable =
-            currencyRepository.getCurrencyValue(currency).subscribe({ result ->
-                result.let {
-                    val total: Double?
-                    if (!currency.equals(defaultBase)) {
-                        total = result.currencyValue?.toDouble()
-                            ?.let { value -> amount?.toDouble()?.times(value) }
-                        var totalBal =
-                            total?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString()
-                        _dialogMessage.postValue("$amount $baseCurrency to $totalBal $currency")
-                    }
-                }
-                currencyInitialValueDisposable.safeDispose()
-            }, {
-                _dialogMessage.postValue("Unable to convert!")
-                currencyInitialValueDisposable?.safeDispose()
-            })
-    }
-
-//    fun convertedBalance(currency: String?, amount: String?) {
-//        var isExist = false
-//        currencyIfExistDisposable =
-//            currencyRepository.getCurrencyBalance(currency).subscribe({ result ->
-//                if (currency.equals(result.currency)) {
-//                    isExist = true
-//                    println("$currency===========${result.currency}")
-//                }
-//                currencyIfExistDisposable?.safeDispose()
-//            }, {
-//                _errorMessage.postValue(R.string.error_database)
-//                currencyIfExistDisposable?.safeDispose()
-//            })
-//
-//        if (!isExist) {
-//            computeConvertedBalance(
-//                currency,
-//                amount
-//            )
-//        }
-//    }
-
-    fun computeConvertedBalance(currency: String?, amount: String?) {
-        currencyValueDisposable =
-            currencyRepository.getCurrencyValue(currency).subscribe({ result ->
-                result.let {
-                    val total: Double?
-                    if (!currency.equals(defaultBase)) {
-                        total = result.currencyValue?.toDouble()
-                            ?.let { value -> amount?.toDouble()?.times(value) }
-
-                        _currentBalance.postValue(amount?.toDouble()?.let { currBalance ->
-                            defaultCurrentBalance?.minus(
-                                currBalance
-                            )
-                        }.toString())
-                        var totalBal =
-                            total?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString()
-                        _balanceResult.postValue(BalanceItem(currency, totalBal))
-                        currencyRepository.saveBalance(currency, totalBal)
-                    }
-                }
-                currencyValueDisposable.safeDispose()
-            }, {
-                _errorMessage.postValue(R.string.error_database)
-                currencyValueDisposable?.safeDispose()
-            })
-    }
-
-    fun updateDefaultBalance(currBalance: String?) {
-        currencyRepository.updateDefaultBalance(
-            defaultBase,
-            BigDecimal(currBalance).setScale(2, RoundingMode.HALF_UP).toString()
-        )
-        defaultBalance()
-    }
-
-    fun getBalances() {
-        balancesDBDisposable = currencyRepository.getSaveBalances()
-            .subscribe(
-                { result ->
-                    _balanceListResult.postValue(result.entityModelToBalanceItem())
-                    balancesDBDisposable?.safeDispose()
-                },
-                {
-                    _errorMessage.postValue(R.string.error_database)
-                    balancesDBDisposable?.safeDispose()
-                }
-            )
-    }
-
-    fun defaultBalance() {
-        baseDisposable = currencyRepository.getBase().subscribe(
+        _isLoading.postValue(true)
+        payseraResponseDisposable = currencyRepository.getPayseraResponse().subscribe(
             { result ->
-                defaultBase = result.base
-                defaultDate = result.date
-                _currentBalance.postValue(result.currentBalance)
-                defaultCurrentBalance = result.currentBalance?.toDouble()
-                defaultCommissionFee = result.commissionFee?.toDouble()
-                baseDisposable.safeDispose()
+                currencyRepository.saveCurrencies(result.rates, result.base)
+                payseraResponseDisposable?.safeDispose()
             },
             {
+                _errorMessage.postValue(R.string.error_network_connection)
+                _isLoading.postValue(false)
+                payseraResponseDisposable?.safeDispose()
+            }
+        )
+    }
+
+    fun getCurrencies() {
+        currenciesDisposable = currencyRepository.queryCurrencies()
+            .doFinally {
+                _isLoading.postValue(false)
+            }
+            .subscribe({ result ->
+                parseBalanceList(result, false)
+                _errorMessage.postValue(R.string.currencies_message)
+                currenciesDisposable?.safeDispose()
+            }, {
                 _errorMessage.postValue(R.string.error_database)
-                baseDisposable.safeDispose()
+                _isLoading.postValue(false)
+                currenciesDisposable?.safeDispose()
             })
+    }
+
+    fun computeConvertedBalance(
+        fromCurrency: String?,
+        toCurrency: String?,
+        fromBalance: String?,
+        amount: String?
+    ) {
+
+        val amountBal: Double = amount?.toDoubleOrNull() ?: 0.0
+        val currencyBal: Double = fromBalance?.toDouble() ?: 0.0
+
+        if (amountBal > currencyBal || amountBal == 0.0 || fromCurrency.equals(toCurrency)) {
+            _errorMessage.postValue(R.string.invalid_message)
+            return
+        }
+        _isComputing.postValue(true)
+        computeDisposable = currencyRepository.queryCurrencies()
+            .doFinally { _isComputing.postValue(false) }
+            .subscribe(
+                { result ->
+
+                    val baseBalance = result.find { currencyEntity: CurrencyEntity ->
+                        currencyEntity.currency.equals(fromCurrency)
+                    }
+
+                    if (amountBal > baseBalance?.currencyBalance?.toDoubleOrNull() ?: 0.0) {
+                        _errorMessage.postValue(R.string.invalid_message)
+                    } else {
+
+                        val totalBaseBalance =
+                            amountBal.let { baseBalance?.currencyBalance?.toDouble()?.minus(it) }
+                        // Update DB for base currency.
+                        updateDB(toCurrency, totalBaseBalance, true)
+
+                        val selectedCurrBal = result.find { currencyEntity: CurrencyEntity ->
+                            currencyEntity.currency.equals(toCurrency)
+                        }
+
+                        val total =
+                            selectedCurrBal?.currencyValue?.toDouble()?.let {
+                                amountBal.times(
+                                    it
+                                )
+                            }
+                        // Update DB for the converted currency.
+                        updateDB(toCurrency, total, true)
+                    }
+                    computeDisposable?.safeDispose()
+                },
+                {
+                    _errorMessage.postValue(R.string.error_database)
+                    computeDisposable?.safeDispose()
+                    _isComputing.postValue(false)
+                })
+    }
+
+    private fun updateDB(currency: String?, total: Double?, isAvailable: Boolean) {
+        currencyRepository.updateCurrencyEntity(
+            currency,
+            total?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString(),
+            isAvailable
+        )
+    }
+
+    fun updateUI() {
+        _isUpdating.postValue(true)
+        updateDisposable = currencyRepository.queryCurrencies()
+            .doFinally {
+                _isUpdating.postValue(false)
+            }
+            .subscribe({ result ->
+                parseBalanceList(result, true)
+                updateDisposable?.safeDispose()
+            }, {
+                _errorMessage.postValue(R.string.error_database)
+                _isUpdating.postValue(false)
+                updateDisposable?.safeDispose()
+            })
+    }
+
+    private fun parseBalanceList(result: List<CurrencyEntity>, isCurrencyLoaded: Boolean) {
+        var mCurrencies = ArrayList<String?>()
+        var list: MutableList<BalanceItem> = ArrayList()
+        result.forEach { currencyEntity: CurrencyEntity ->
+            if (currencyEntity.isBase) {
+                _currencyBalance.postValue(currencyEntity.currencyBalance)
+            }
+            if (currencyEntity.isAvailable && !currencyEntity.isBase) list.add(
+                BalanceItem(
+                    currencyEntity.currency,
+                    currencyEntity.currencyBalance
+                )
+            )
+            if (!isCurrencyLoaded) mCurrencies.add(currencyEntity.currency)
+        }
+        if (!isCurrencyLoaded) _currencies.postValue(mCurrencies)
+        _balanceListResult.postValue(list)
     }
 }

@@ -15,7 +15,8 @@ import java.lang.reflect.ParameterizedType
 /**
  * Created by eduardo.delito on 3/11/20.
  */
-abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFragment(){
+abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFragment() {
+
     private lateinit var viewDataBinding: T
 
     protected abstract val viewModel: V
