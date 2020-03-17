@@ -93,7 +93,11 @@ class CurrencyRepositoryImpl(
             .subscribe { updateToCurrencyDisposable?.safeDispose() }
     }
 
-    override fun updateFromCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean) {
+    override fun updateFromCurrencyEntity(
+        currency: String?,
+        amount: String?,
+        isAvailable: Boolean
+    ) {
         updateFromCurrencyDisposable = Observable.fromCallable {
                 currencyDao.updateCurrencyEntity(currency, amount, isAvailable)
                 updateFromCurrencyDisposable.safeDispose()

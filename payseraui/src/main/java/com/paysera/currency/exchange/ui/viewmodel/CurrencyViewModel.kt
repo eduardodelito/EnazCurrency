@@ -46,6 +46,9 @@ class CurrencyViewModel @Inject constructor(
     private val _currencyBalance = MutableLiveData<String>()
     val currencyBalance: LiveData<String> get() = _currencyBalance
 
+    //Should come from the service response.
+    private var commissionFee: Double = 0.7 // 0.7%
+
     fun getPayseraResponse() {
         payseraResponseDisposable = currencyRepository.getPayseraResponse().subscribe(
             { result ->
@@ -79,14 +82,14 @@ class CurrencyViewModel @Inject constructor(
         fromCurrency: String?,
         toCurrency: String?,
         fromBalance: String?,
-        amount: String?,
+        toBalance: String?,
         initial: Boolean
     ) {
 
-        val amountBal: Double = amount?.toDoubleOrNull() ?: 0.0
-        val currencyBal: Double = fromBalance?.toDouble() ?: 0.0
+        val fromBal: Double = fromBalance?.toDouble() ?: 0.0
+        val toBal: Double = toBalance?.toDoubleOrNull() ?: 0.0
 
-        if (amountBal > currencyBal || amountBal == 0.0 || fromCurrency.equals(toCurrency)) {
+        if (toBal > fromBal || toBal == 0.0 || fromCurrency.equals(toCurrency)) {
             _errorMessage.postValue(R.string.invalid_message)
             return
         }
@@ -96,16 +99,19 @@ class CurrencyViewModel @Inject constructor(
             .subscribe(
                 { result ->
 
-                    val baseBalance = result.find { currencyEntity: CurrencyEntity ->
+                    // Get the base balance to convert
+                    val fromBaseBalance = result.find { currencyEntity: CurrencyEntity ->
                         currencyEntity.currency.equals(fromCurrency)
                     }
 
-                    if (amountBal > baseBalance?.currencyBalance?.toDoubleOrNull() ?: 0.0) {
+                    // Check if selected amount is greater than base balance to convert.
+                    // If true, return an invalid message.
+                    if (toBal > fromBaseBalance?.currencyBalance?.toDoubleOrNull() ?: 0.0) {
                         _errorMessage.postValue(R.string.invalid_message)
                     } else {
 
-                        val totalBaseBalance =
-                            amountBal.let { baseBalance?.currencyBalance?.toDouble()?.minus(it) }
+                        val totalFromBaseBalance =
+                            toBal.let { fromBaseBalance?.currencyBalance?.toDouble()?.minus(it) }
 
                         val selectedCurrBal = result.find { currencyEntity: CurrencyEntity ->
                             currencyEntity.currency.equals(toCurrency)
@@ -113,27 +119,46 @@ class CurrencyViewModel @Inject constructor(
 
                         val subTotal =
                             selectedCurrBal?.currencyValue?.toDouble()?.let {
-                                amountBal.times(
+                                toBal.times(
                                     it
                                 )
                             }
 
+                        val isCommissionFeeApplied =
+                            result.filter { currencyEntity: CurrencyEntity -> currencyEntity.isAvailable }.size
+
+                        var computedWithCommissionFee: Double?
+
+                        computedWithCommissionFee = if (isCommissionFeeApplied > 5) {
+                            val computeCommissionFeePercent = commissionFee.div(100)
+                            val computeCommissionFee = subTotal?.times(computeCommissionFeePercent)
+                            computeCommissionFee?.let { subTotal.minus(it) }
+                        } else {
+                            subTotal
+                        }
+
+                        val commissionFeeMessage = if (isCommissionFeeApplied > 5)
+                            "Commission Fee - $commissionFee% $fromCurrency" else ""
+
                         if (initial) {
+
                             _dialogMessage.postValue(
-                                "From ${convertDoubleToBigDecimal(amountBal)} $fromCurrency to ${convertDoubleToBigDecimal(
-                                    subTotal
-                                )} $toCurrency"
+                                "From ${convertDoubleToBigDecimal(toBal)} $fromCurrency to ${convertDoubleToBigDecimal(
+                                    computedWithCommissionFee
+                                )} $toCurrency. $commissionFeeMessage"
                             )
                         } else {
 
                             // Update DB for base currency.
                             currencyRepository.updateFromCurrencyEntity(
                                 fromCurrency,
-                                convertDoubleToBigDecimal(totalBaseBalance), true
+                                convertDoubleToBigDecimal(totalFromBaseBalance), true
                             )
 
-                            val total = subTotal?.plus(selectedCurrBal.currencyBalance?.toDouble() ?: 0.0)
-                            println(total)
+                            val total =
+                                computedWithCommissionFee?.plus(
+                                    selectedCurrBal?.currencyBalance?.toDouble() ?: 0.0
+                                )
 
                             // Update DB for the converted currency.
                             currencyRepository.updateToCurrencyEntity(
