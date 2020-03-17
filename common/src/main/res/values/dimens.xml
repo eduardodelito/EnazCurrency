@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--height-->
+    <dimen name="label_height_1">1dp</dimen>
+    <dimen name="label_height_40">40dp</dimen>
+    <dimen name="label_height_50">50dp</dimen>
+    <dimen name="label_height_80">80dp</dimen>
+
+    <!--width-->
+    <dimen name="label_width_16">16dp</dimen>
+    <dimen name="label_width_100">100dp</dimen>
+    <dimen name="label_width_200">200dp</dimen>
+
+    <!--margin-->
+    <dimen name="label_margin_10">10dp</dimen>
+    <dimen name="label_margin_20">20dp</dimen>
+    <dimen name="label_margin_50">20dp</dimen>
+    <dimen name="label_margin_100">100dp</dimen>
+
+
+    <!--padding-->
+    <dimen name="label_padding_5">5dp</dimen>
+    <dimen name="label_padding_20">20dp</dimen>
+
+</resources>

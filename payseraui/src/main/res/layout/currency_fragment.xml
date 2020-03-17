@@ -17,10 +17,10 @@
         <TextView
             android:id="@+id/my_balances_lbl"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
+            android:layout_height="@dimen/label_height_50"
+            android:layout_margin="@dimen/label_margin_50"
             android:gravity="left"
-            android:text="MY BALANCES"
+            android:text="@string/label_my_balances"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="176dp"
             android:textColor="@color/design_default_color_on_secondary"/>
@@ -28,9 +28,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/list_layout"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:layout_height="@dimen/label_height_80"
+            android:paddingLeft="@dimen/label_padding_20"
+            android:paddingRight="@dimen/label_padding_20"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/my_balances_lbl">
@@ -39,9 +39,9 @@
             <LinearLayout
                 android:id="@+id/my_balance_account_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="80dp"
+                android:layout_height="@dimen/label_height_80"
                 android:orientation="vertical"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="@dimen/label_margin_10"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -50,17 +50,17 @@
                 <TextView
                     android:id="@+id/currency_txt_lbl"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="@dimen/label_height_40"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="EUR"
+                    android:text="@string/label_currency_default"
                     android:textColor="@color/design_default_color_on_secondary" />
 
                 <TextView
                     android:id="@+id/amount_txt_lbl"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="@dimen/label_height_40"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="0.00"
+                    android:text="@string/label_amount_default"
                     android:textColor="@color/design_default_color_on_secondary" />
 
 
@@ -78,10 +78,10 @@
         <TextView
             android:id="@+id/currency_exchange_lbl"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/label_height_50"
             android:gravity="start|center_vertical"
-            android:paddingLeft="20dp"
-            android:text="CURRENCY EXCHANGE"
+            android:paddingLeft="@dimen/label_padding_20"
+            android:text="@string/label_currency_exchange"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/list_layout"
@@ -98,9 +98,9 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp">
+                android:layout_height="@dimen/label_height_50"
+                android:paddingLeft="@dimen/label_padding_20"
+                android:paddingRight="@dimen/label_padding_20">
 
                 <ImageView
                     android:id="@+id/sell_image"
@@ -115,8 +115,8 @@
                     android:id="@+id/sell_lbl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text="Sell"
+                    android:layout_marginStart="@dimen/label_margin_20"
+                    android:text="@string/label_sell"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/sell_image"
                     app:layout_constraintTop_toTopOf="parent"
@@ -124,14 +124,14 @@
 
                 <EditText
                     android:id="@+id/sell_field"
-                    android:layout_width="100dp"
+                    android:layout_width="@dimen/label_width_100"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="@dimen/label_margin_10"
                     android:ems="10"
                     android:gravity="end"
-                    android:hint="0.00"
+                    android:hint="@string/label_amount_default"
                     android:inputType="numberDecimal"
-                    android:paddingRight="5dp"
+                    android:paddingRight="@dimen/label_padding_5"
                     android:maxLength="9"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/currency_lbl"
@@ -142,8 +142,8 @@
                     android:id="@+id/currency_lbl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:text="EUR"
+                    android:layout_marginEnd="@dimen/label_margin_10"
+                    android:text="@string/label_currency_default"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/drop_down_image"
                     app:layout_constraintTop_toTopOf="parent"
@@ -151,7 +151,7 @@
 
                 <ImageView
                     android:id="@+id/drop_down_image"
-                    android:layout_width="16dp"
+                    android:layout_width="@dimen/label_width_16"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -166,9 +166,9 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp">
+                android:layout_height="@dimen/label_height_50"
+                android:paddingLeft="@dimen/label_padding_20"
+                android:paddingRight="@dimen/label_padding_20">
 
                 <ImageView
                     android:id="@+id/receive_image"
@@ -183,8 +183,8 @@
                     android:id="@+id/receive_lbl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text="Receive"
+                    android:layout_marginStart="@dimen/label_margin_20"
+                    android:text="@string/label_receive"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/receive_image"
                     app:layout_constraintTop_toTopOf="parent"
@@ -192,12 +192,12 @@
 
                 <TextView
                     android:id="@+id/receive_text"
-                    android:layout_width="100dp"
+                    android:layout_width="@dimen/label_width_100"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="@dimen/label_margin_10"
                     android:gravity="end"
-                    android:paddingRight="5dp"
-                    android:text="0"
+                    android:paddingRight="@dimen/label_padding_5"
+                    android:text="@string/label_amount_default"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/currency_receive_lbl"
                     app:layout_constraintTop_toTopOf="parent"
@@ -207,8 +207,8 @@
                     android:id="@+id/currency_receive_lbl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:text="EUR"
+                    android:layout_marginEnd="@dimen/label_margin_10"
+                    android:text="@string/label_currency_default"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/drop_down_receive_image"
                     app:layout_constraintTop_toTopOf="parent"
@@ -216,7 +216,7 @@
 
                 <ImageView
                     android:id="@+id/drop_down_receive_image"
-                    android:layout_width="16dp"
+                    android:layout_width="@dimen/label_width_16"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -226,18 +226,18 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="@dimen/label_height_1"
                 android:background="@color/design_default_color_primary" />
         </LinearLayout>
 
         <Button
             android:id="@+id/submit_button"
-            android:layout_width="200dp"
+            android:layout_width="@dimen/label_width_200"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="@dimen/label_margin_100"
             android:background="@drawable/submit_button"
-            android:text="Submit"
-            android:textColor="#ffffff"
+            android:text="@string/label_submit"
+            android:textColor="@color/design_default_color_background"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/converter_layout" />

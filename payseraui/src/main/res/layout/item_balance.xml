@@ -9,9 +9,9 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="100dp"
-        android:layout_height="80dp"
-        android:layout_marginRight="10dp"
+        android:layout_width="@dimen/label_width_100"
+        android:layout_height="@dimen/label_height_80"
+        android:layout_marginRight="@dimen/label_margin_10"
         android:clickable="true"
         android:focusable="true"
         app:cardElevation="0dp"
@@ -37,7 +37,7 @@
                 <TextView
                     android:id="@+id/currency_txt_lbl"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="@dimen/label_height_40"
                     android:gravity="center_vertical|center_horizontal"
                     android:text="@{item.currency}"
                     android:textColor="@color/design_default_color_on_secondary" />
@@ -45,7 +45,7 @@
                 <TextView
                     android:id="@+id/amount_txt_lbl"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="@dimen/label_height_40"
                     android:gravity="center_vertical|center_horizontal"
                     android:textColor="@color/design_default_color_on_secondary" />
             </LinearLayout>
