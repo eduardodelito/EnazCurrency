@@ -21,12 +21,12 @@
             android:layout_margin="@dimen/label_margin_50"
             android:gravity="left"
             android:text="@string/label_my_balances"
+            android:textColor="@color/design_default_color_on_secondary"
             app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="176dp"
-            android:textColor="@color/design_default_color_on_secondary"/>
+            tools:layout_editor_absoluteX="176dp" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/list_layout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/label_height_80"
             android:paddingLeft="@dimen/label_padding_20"
@@ -35,45 +35,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/my_balances_lbl">
 
-
-            <LinearLayout
-                android:id="@+id/my_balance_account_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/label_height_80"
-                android:orientation="vertical"
-                android:layout_marginRight="@dimen/label_margin_10"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0">
-
-                <TextView
-                    android:id="@+id/currency_txt_lbl"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/label_height_40"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/label_currency_default"
-                    android:textColor="@color/design_default_color_on_secondary" />
-
-                <TextView
-                    android:id="@+id/amount_txt_lbl"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/label_height_40"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/label_amount_default"
-                    android:textColor="@color/design_default_color_on_secondary" />
-
-
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/my_balance_account_layout"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.recyclerview.widget.RecyclerView>
 
         <TextView
             android:id="@+id/currency_exchange_lbl"
@@ -82,10 +44,10 @@
             android:gravity="start|center_vertical"
             android:paddingLeft="@dimen/label_padding_20"
             android:text="@string/label_currency_exchange"
+            android:textColor="@color/design_default_color_on_secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/list_layout"
-            android:textColor="@color/design_default_color_on_secondary"/>
+            app:layout_constraintTop_toBottomOf="@+id/recycler_view" />
 
         <LinearLayout
             android:id="@+id/converter_layout"
@@ -117,10 +79,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/label_margin_20"
                     android:text="@string/label_sell"
+                    android:textColor="@color/design_default_color_on_secondary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/sell_image"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textColor="@color/design_default_color_on_secondary"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <EditText
                     android:id="@+id/sell_field"
@@ -131,12 +93,12 @@
                     android:gravity="end"
                     android:hint="@string/label_amount_default"
                     android:inputType="numberDecimal"
-                    android:paddingRight="@dimen/label_padding_5"
                     android:maxLength="9"
+                    android:paddingRight="@dimen/label_padding_5"
+                    android:textColor="@color/design_default_color_on_secondary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/currency_lbl"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textColor="@color/design_default_color_on_secondary"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/currency_lbl"
@@ -144,10 +106,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/label_margin_10"
                     android:text="@string/label_currency_default"
+                    android:textColor="@color/design_default_color_on_secondary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/drop_down_image"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textColor="@color/design_default_color_on_secondary"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/drop_down_image"
@@ -185,10 +147,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/label_margin_20"
                     android:text="@string/label_receive"
+                    android:textColor="@color/design_default_color_on_secondary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/receive_image"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textColor="@color/design_default_color_on_secondary"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/receive_text"
@@ -198,10 +160,10 @@
                     android:gravity="end"
                     android:paddingRight="@dimen/label_padding_5"
                     android:text="@string/label_amount_default"
+                    android:textColor="@color/lime_green"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/currency_receive_lbl"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textColor="@color/lime_green"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/currency_receive_lbl"
@@ -209,10 +171,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/label_margin_10"
                     android:text="@string/label_currency_default"
+                    android:textColor="@color/design_default_color_on_secondary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/drop_down_receive_image"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:textColor="@color/design_default_color_on_secondary"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/drop_down_receive_image"

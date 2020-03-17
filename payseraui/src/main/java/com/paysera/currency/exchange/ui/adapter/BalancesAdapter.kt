@@ -62,5 +62,12 @@ class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
         notifyDataSetChanged()
     }
 
+    /**
+     *
+     */
+    fun getBaseBalance(currency: String?): String? {
+        return list.find { balance: BalanceItem -> currency.equals(balance.currency)}?.amount
+    }
+
     inner class TrackViewHolder(val binding: ItemBalanceBinding) : RecyclerView.ViewHolder(binding.root)
 }

@@ -1,5 +1,8 @@
 package com.paysera.currency.exchange.ui
 
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
 import com.paysera.currency.exchange.common.fragment.BaseFragment
 import com.paysera.currency.exchange.ui.adapter.BalancesAdapter
@@ -36,6 +39,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     }
 
     override fun initViews() {
+        setHasOptionsMenu(true)
         balancesAdapter = BalancesAdapter()
         with(recycler_view) {
             layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -55,11 +59,33 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             viewModel.computeConvertedBalance(
                 currency_lbl.text.toString(),
                 currency_receive_lbl.text.toString(),
-                amount_txt_lbl.text.toString(),
+                balancesAdapter.getBaseBalance(currency_lbl.text.toString()),
                 sell_field.text.toString()
                 , true
             )
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.menu_main, menu)
+
+        //hide some items from this fragment (e.g. sort)
+        menu.findItem(R.id.action_reset).isVisible = false
+        menuInflater.inflate(R.menu.menu_main, menu)
+        super.onCreateOptionsMenu(menu, menuInflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.action_reset -> {
+                progressBar.dialog.show()
+                viewModel.getPayseraResponse()
+                viewModel.getCurrencies()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun subscribeUi() {
@@ -69,9 +95,9 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
                 Toast.makeText(context, messageId?.let { getString(it) }, Toast.LENGTH_LONG).show()
             })
 
-            isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-                if (!isLoading) progressBar.dialog.hide()
-            })
+//            isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+//                if (!isLoading) progressBar.dialog.hide()
+//            })
 
             isComputing.observe(viewLifecycleOwner, Observer { isComputing ->
                 if (!isComputing) updateUI()
@@ -81,17 +107,17 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
                 mCurrencies = result
             })
 
-            currencyBalance.observe(viewLifecycleOwner, Observer { result ->
-                amount_txt_lbl.text = result
-            })
-
             balanceListResult.observe(viewLifecycleOwner, Observer { result ->
-                if (result.isNotEmpty())
-                    balancesAdapter.updateDataSet(result)
+                balancesAdapter.updateDataSet(result)
+                progressBar.dialog.hide()
             })
 
             dialogMessage.observe(viewLifecycleOwner, Observer { message ->
                 submitDialog(message)
+            })
+
+            currencyReceive.observe(viewLifecycleOwner, Observer { receive ->
+                receive_text.text = "+ $receive"
             })
         }
     }
@@ -109,7 +135,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         viewModel.computeConvertedBalance(
             currency_lbl.text.toString(),
             currency_receive_lbl.text.toString(),
-            amount_txt_lbl.text.toString(),
+            balancesAdapter.getBaseBalance(currency_lbl.text.toString()),
             sell_field.text.toString()
             , false
         )

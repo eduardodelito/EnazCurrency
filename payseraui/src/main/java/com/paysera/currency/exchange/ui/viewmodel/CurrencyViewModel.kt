@@ -25,8 +25,8 @@ class CurrencyViewModel @Inject constructor(
     private var computeDisposable: Disposable? = null
     private var updateDisposable: Disposable? = null
 
-    private val _isLoading = MutableLiveData<Boolean>(true)
-    val isLoading: LiveData<Boolean> get() = _isLoading
+//    private val _isLoading = MutableLiveData<Boolean>(true)
+//    val isLoading: LiveData<Boolean> get() = _isLoading
 
     private val _isComputing = MutableLiveData<Boolean>(true)
     val isComputing: LiveData<Boolean> get() = _isComputing
@@ -43,8 +43,8 @@ class CurrencyViewModel @Inject constructor(
     private val _balanceListResult = MutableLiveData<MutableList<BalanceItem>>()
     val balanceListResult: LiveData<MutableList<BalanceItem>> get() = _balanceListResult
 
-    private val _currencyBalance = MutableLiveData<String>()
-    val currencyBalance: LiveData<String> get() = _currencyBalance
+    private val _currencyReceive = MutableLiveData<String>()
+    val currencyReceive: LiveData<String> get() = _currencyReceive
 
     //Should come from the service response.
     private var commissionFee: Double = 0.7 // 0.7%
@@ -64,16 +64,16 @@ class CurrencyViewModel @Inject constructor(
 
     fun getCurrencies() {
         currenciesDisposable = currencyRepository.queryCurrencies()
-            .doFinally {
-                _isLoading.postValue(false)
-            }
+//            .doFinally {
+//                _isLoading.postValue(false)
+//            }
             .subscribe({ result ->
                 parseBalanceList(result, false)
                 _errorMessage.postValue(R.string.currencies_message)
                 currenciesDisposable?.safeDispose()
             }, {
                 _errorMessage.postValue(R.string.error_database)
-                _isLoading.postValue(false)
+//                _isLoading.postValue(false)
                 currenciesDisposable?.safeDispose()
             })
     }
@@ -159,7 +159,7 @@ class CurrencyViewModel @Inject constructor(
                                 computedWithCommissionFee?.plus(
                                     selectedCurrBal?.currencyBalance?.toDouble() ?: 0.0
                                 )
-
+                            _currencyReceive.postValue(convertDoubleToBigDecimal(total))
                             // Update DB for the converted currency.
                             currencyRepository.updateToCurrencyEntity(
                                 toCurrency, convertDoubleToBigDecimal(total), true
@@ -194,10 +194,7 @@ class CurrencyViewModel @Inject constructor(
         var mCurrencies = ArrayList<String?>()
         var list: MutableList<BalanceItem> = ArrayList()
         result.forEach { currencyEntity: CurrencyEntity ->
-            if (currencyEntity.isBase) {
-                _currencyBalance.postValue(currencyEntity.currencyBalance)
-            }
-            if (currencyEntity.isAvailable && !currencyEntity.isBase) list.add(
+            if (currencyEntity.isAvailable) list.add(
                 BalanceItem(
                     currencyEntity.currency,
                     currencyEntity.currencyBalance

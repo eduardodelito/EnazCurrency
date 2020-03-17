@@ -27,7 +27,6 @@ interface CurrencyRepository {
     fun updateFromCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean)
 
     fun updateToCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean)
-
 }
 
 class CurrencyRepositoryImpl(
@@ -42,13 +41,13 @@ class CurrencyRepositoryImpl(
     override fun getPayseraResponse(): Observable<PayseraResponse> {
         return apiClient.getService().getCurrencies()
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread());
+            .observeOn(AndroidSchedulers.mainThread())
     }
 
     override fun saveCurrencies(rates: Any?, base: String?) {
         saveCurrencyDisposable = Observable.fromCallable {
-                currencyDao.deleteCurrencies()
                 rates?.let { rateList ->
+                    currencyDao.deleteCurrencies()
                     currencyDao.insertCurrencies(
                         currencyListResult(
                             base,
@@ -67,7 +66,7 @@ class CurrencyRepositoryImpl(
         val jObject = JSONObject(rateList.toString())
         val keys: Iterator<String> = jObject.keys()
         var currencyList = ArrayList<CurrencyRatesResult>()
-        currencyList.add(CurrencyRatesResult(base, "1", "1000", false, true))
+        currencyList.add(CurrencyRatesResult(base, "1", "1000", true, true))
         while (keys.hasNext()) {
             val key = keys.next()
             currencyList.add(
