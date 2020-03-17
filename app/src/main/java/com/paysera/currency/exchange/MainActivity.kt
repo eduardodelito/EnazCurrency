@@ -16,5 +16,4 @@ class MainActivity : DaggerAppCompatActivity() {
             CurrencyFragment.newInstance().navigate(supportFragmentManager, R.id.layout_container, false)
         }
     }
-
 }

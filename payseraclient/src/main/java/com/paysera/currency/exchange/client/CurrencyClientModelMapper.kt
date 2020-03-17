@@ -1,8 +1,6 @@
 package com.paysera.currency.exchange.client
 
-import com.paysera.currency.exchange.client.model.BaseAndDateResult
 import com.paysera.currency.exchange.client.model.CurrencyRatesResult
-import com.paysera.currency.exchange.db.entity.BaseAndDateEntity
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
 
 /**
@@ -19,14 +17,4 @@ fun List<CurrencyRatesResult>.serviceModelToCurrencyEntity(): List<CurrencyEntit
             isBase = it.isBase
         )
     }
-}
-
-fun BaseAndDateResult.serviceModelToBaseAndDateEntity(): BaseAndDateEntity {
-    return BaseAndDateEntity(
-        id = 0,
-        base = base,
-        date = date,
-        currentBalance = currentBance,
-        commissionFee = commissionFee
-    )
 }

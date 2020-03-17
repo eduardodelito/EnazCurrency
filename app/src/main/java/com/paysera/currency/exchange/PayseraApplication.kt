@@ -28,5 +28,4 @@ class PayseraApplication : DaggerApplication() {
             .networkModule(NetworkModule())
             .build()
     }
-
 }

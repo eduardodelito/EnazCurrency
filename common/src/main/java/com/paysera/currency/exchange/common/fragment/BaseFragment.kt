@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
@@ -103,9 +102,16 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         super.onStop()
         viewModel.onStop()
     }
-
+    /**
+     *  Update the added balance on the list after the conversion.
+     */
     abstract fun updateReceiveUI(selected: String?, isReceive: Boolean)
 
+    /**
+     *  Show dialog to select available currencies.
+     *  @param currencies list of currencies
+     *  @param if dialog shown from receive cta.
+     */
     fun showDialog(currencies: ArrayList<String?>, isReceive: Boolean) {
         var selected: String? = ""
         val listItems = currencies.toTypedArray<CharSequence?>()
@@ -129,8 +135,14 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         mDialog?.show()
     }
 
+    /**
+     *  Update the remaining balance after the convertion.
+     */
     abstract fun updateBalanceUI()
 
+    /**
+     *  Show the submitted dialog when converting currencies.
+     */
     fun submitDialog(message: String?) {
         val mBuilder = context?.let { AlertDialog.Builder(it) }
         mBuilder?.setMessage("Are you sure you want to convert $message?")
@@ -150,6 +162,9 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         mDialog?.show()
     }
 
+    /**
+     *  Show the confirmation dialog after the conversion.
+     */
     private fun confirmationDialog(message: String?) {
         val mBuilder = context?.let { AlertDialog.Builder(it) }
         mBuilder?.setTitle("Currency Converted")
