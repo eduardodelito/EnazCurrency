@@ -11,15 +11,12 @@ import com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel
 import kotlinx.android.synthetic.main.currency_fragment.*
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.paysera.currency.exchange.common.util.CustomProgressBar
 import javax.inject.Inject
 
 /**
  * Created by eduardo.delito on 3/11/20.
  */
 class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>() {
-
-    val progressBar = CustomProgressBar()
 
     @Inject
     override lateinit var viewModel: CurrencyViewModel
@@ -32,10 +29,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     private var mCurrencies = ArrayList<String?>()
 
     override fun initData() {
-        with(viewModel) {
-            getPayseraResponse()
-            getCurrencies()
-        }
+        viewModel.getPayseraResponse()
     }
 
     override fun initViews() {
@@ -46,8 +40,6 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             setHasFixedSize(true)
             adapter = balancesAdapter
         }
-
-        context?.let { progressBar.show(it, "Please wait...") }
 
         drop_down_image.setOnClickListener {
             showDialog(mCurrencies, false)
@@ -79,9 +71,8 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         // Handle presses on the action bar menu items
         when (item.itemId) {
             R.id.action_reset -> {
-                progressBar.dialog.show()
                 viewModel.getPayseraResponse()
-                viewModel.getCurrencies()
+                receive_text.text = "+ 0"
                 return true
             }
         }
@@ -95,10 +86,6 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
                 Toast.makeText(context, messageId?.let { getString(it) }, Toast.LENGTH_LONG).show()
             })
 
-//            isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-//                if (!isLoading) progressBar.dialog.hide()
-//            })
-
             isComputing.observe(viewLifecycleOwner, Observer { isComputing ->
                 if (!isComputing) updateUI()
             })
@@ -109,7 +96,6 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
 
             balanceListResult.observe(viewLifecycleOwner, Observer { result ->
                 balancesAdapter.updateDataSet(result)
-                progressBar.dialog.hide()
             })
 
             dialogMessage.observe(viewLifecycleOwner, Observer { message ->

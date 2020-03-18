@@ -12,6 +12,9 @@ interface CurrencyDao {
     @Query("SELECT * FROM CurrencyEntity")
     fun getAllCurrencies(): Observable<List<CurrencyEntity>>
 
+    @Query("SELECT * FROM CurrencyEntity")
+    fun getAllSaveCurrencies(): List<CurrencyEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCurrencies(currencyList: List<CurrencyEntity>)
 

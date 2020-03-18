@@ -25,9 +25,6 @@ class CurrencyViewModel @Inject constructor(
     private var computeDisposable: Disposable? = null
     private var updateDisposable: Disposable? = null
 
-//    private val _isLoading = MutableLiveData<Boolean>(true)
-//    val isLoading: LiveData<Boolean> get() = _isLoading
-
     private val _isComputing = MutableLiveData<Boolean>(true)
     val isComputing: LiveData<Boolean> get() = _isComputing
 
@@ -50,30 +47,32 @@ class CurrencyViewModel @Inject constructor(
     private var commissionFee: Double = 0.7 // 0.7%
 
     fun getPayseraResponse() {
-        payseraResponseDisposable = currencyRepository.getPayseraResponse().subscribe(
-            { result ->
-                currencyRepository.saveCurrencies(result.rates, result.base)
-                payseraResponseDisposable?.safeDispose()
-            },
-            {
-                _errorMessage.postValue(R.string.error_network_connection)
-                payseraResponseDisposable?.safeDispose()
+        currencyRepository.deleteCurrencies()
+        payseraResponseDisposable = currencyRepository.getPayseraResponse()
+            .doFinally {
+                getCurrencies()
             }
-        )
+            .subscribe(
+                {
+                    if (it?.rates.toString().isNullOrEmpty())
+                        _errorMessage.postValue(R.string.error_network_connection)
+                    payseraResponseDisposable?.safeDispose()
+                },
+                {
+                    _errorMessage.postValue(R.string.error_network_connection)
+                    payseraResponseDisposable?.safeDispose()
+                }
+            )
     }
 
-    fun getCurrencies() {
+    private fun getCurrencies() {
         currenciesDisposable = currencyRepository.queryCurrencies()
-//            .doFinally {
-//                _isLoading.postValue(false)
-//            }
             .subscribe({ result ->
                 parseBalanceList(result, false)
                 _errorMessage.postValue(R.string.currencies_message)
                 currenciesDisposable?.safeDispose()
             }, {
                 _errorMessage.postValue(R.string.error_database)
-//                _isLoading.postValue(false)
                 currenciesDisposable?.safeDispose()
             })
     }
@@ -93,9 +92,7 @@ class CurrencyViewModel @Inject constructor(
             _errorMessage.postValue(R.string.invalid_message)
             return
         }
-        _isComputing.postValue(true)
         computeDisposable = currencyRepository.queryCurrencies()
-            .doFinally { _isComputing.postValue(false) }
             .subscribe(
                 { result ->
 
@@ -164,6 +161,7 @@ class CurrencyViewModel @Inject constructor(
                             currencyRepository.updateToCurrencyEntity(
                                 toCurrency, convertDoubleToBigDecimal(total), true
                             )
+                            _isComputing.postValue(false)
                         }
                     }
                     computeDisposable?.safeDispose()
@@ -171,7 +169,6 @@ class CurrencyViewModel @Inject constructor(
                 {
                     _errorMessage.postValue(R.string.error_database)
                     computeDisposable?.safeDispose()
-                    _isComputing.postValue(false)
                 })
     }
 
@@ -202,7 +199,13 @@ class CurrencyViewModel @Inject constructor(
             )
             if (!isCurrencyLoaded) mCurrencies.add(currencyEntity.currency)
         }
-        if (!isCurrencyLoaded) _currencies.postValue(mCurrencies)
-        _balanceListResult.postValue(list)
+        if (!isCurrencyLoaded) {
+            _currencies.postValue(mCurrencies)
+        }
+        if (list.isEmpty()) {
+            getPayseraResponse()
+        } else {
+            _balanceListResult.postValue(list)
+        }
     }
 }

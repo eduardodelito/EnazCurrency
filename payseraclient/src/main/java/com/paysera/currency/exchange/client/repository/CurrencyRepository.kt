@@ -22,6 +22,8 @@ interface CurrencyRepository {
 
     fun saveCurrencies(rates: Any?, base: String?)
 
+    fun deleteCurrencies()
+
     fun queryCurrencies(): Observable<List<CurrencyEntity>>
 
     fun updateFromCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean)
@@ -35,6 +37,7 @@ class CurrencyRepositoryImpl(
 ) : CurrencyRepository {
 
     private var saveCurrencyDisposable: Disposable? = null
+    private var deleteCurrencyDisposable: Disposable? = null
     private var updateFromCurrencyDisposable: Disposable? = null
     private var updateToCurrencyDisposable: Disposable? = null
 
@@ -42,12 +45,14 @@ class CurrencyRepositoryImpl(
         return apiClient.getService().getCurrencies()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                saveCurrencies(it?.rates, it?.base)
+            }
     }
 
     override fun saveCurrencies(rates: Any?, base: String?) {
         saveCurrencyDisposable = Observable.fromCallable {
                 rates?.let { rateList ->
-                    currencyDao.deleteCurrencies()
                     currencyDao.insertCurrencies(
                         currencyListResult(
                             base,
@@ -55,11 +60,19 @@ class CurrencyRepositoryImpl(
                         ).serviceModelToCurrencyEntity()
                     )
                 }
-                saveCurrencyDisposable.safeDispose()
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { saveCurrencyDisposable?.safeDispose() }
+    }
+
+    override fun deleteCurrencies() {
+        deleteCurrencyDisposable = Observable.fromCallable {
+                currencyDao.deleteCurrencies()
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { deleteCurrencyDisposable?.safeDispose() }
     }
 
     private fun currencyListResult(base: String?, rateList: Any?): ArrayList<CurrencyRatesResult> {
@@ -85,7 +98,6 @@ class CurrencyRepositoryImpl(
     override fun updateToCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean) {
         updateToCurrencyDisposable = Observable.fromCallable {
                 currencyDao.updateCurrencyEntity(currency, amount, isAvailable)
-                updateToCurrencyDisposable.safeDispose()
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -99,7 +111,6 @@ class CurrencyRepositoryImpl(
     ) {
         updateFromCurrencyDisposable = Observable.fromCallable {
                 currencyDao.updateCurrencyEntity(currency, amount, isAvailable)
-                updateFromCurrencyDisposable.safeDispose()
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
