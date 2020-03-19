@@ -18,9 +18,23 @@ interface CurrencyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCurrencies(currencyList: List<CurrencyEntity>)
 
-    @Query("UPDATE CurrencyEntity SET currencyBalance=:amount, isAvailable = :isAvailable WHERE currency = :currency")
-    fun updateCurrencyEntity(currency: String?, amount: String?, isAvailable: Boolean)
-
     @Query("DELETE FROM CurrencyEntity")
     fun deleteCurrencies()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(currencyEntity: CurrencyEntity)
+
+    @Query("SELECT * from CurrencyEntity WHERE currency= :currency")
+    fun getCurrencyEntityByCurrency(currency: String?): List<CurrencyEntity>
+
+    @Query("UPDATE CurrencyEntity SET currencyBalance=:amount WHERE currency = :currency")
+    fun updateQuantity(currency: String?, amount: String?)
+
+    @Transaction
+    fun insertOrUpdate(currency: CurrencyEntity) {
+        val currencyFromDB = getCurrencyEntityByCurrency(currency.currency)
+
+        if (currencyFromDB.isEmpty()) insert(currency)
+        else updateQuantity(currency.currency, currency.currencyBalance)
+    }
 }

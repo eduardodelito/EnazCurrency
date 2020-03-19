@@ -26,10 +26,9 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     override fun getBindingVariable() = BR.viewModel
 
     private lateinit var balancesAdapter: BalancesAdapter
-    private var mCurrencies = ArrayList<String?>()
 
     override fun initData() {
-        viewModel.getPayseraResponse()
+        viewModel.requestCurrencies()
     }
 
     override fun initViews() {
@@ -42,10 +41,10 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         }
 
         drop_down_image.setOnClickListener {
-            showDialog(mCurrencies, false)
+            showDialog(viewModel.currencies(), false)
         }
         drop_down_receive_image.setOnClickListener {
-            showDialog(mCurrencies, true)
+            showDialog(viewModel.currencies(), true)
         }
         submit_button.setOnClickListener {
             viewModel.computeConvertedBalance(
@@ -71,7 +70,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         // Handle presses on the action bar menu items
         when (item.itemId) {
             R.id.action_reset -> {
-                viewModel.getPayseraResponse()
+                viewModel.deleteData()
                 receive_text.text = "+ 0"
                 return true
             }
@@ -88,10 +87,6 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
 
             isComputing.observe(viewLifecycleOwner, Observer { isComputing ->
                 if (!isComputing) updateUI()
-            })
-
-            currencies.observe(viewLifecycleOwner, Observer { result ->
-                mCurrencies = result
             })
 
             balanceListResult.observe(viewLifecycleOwner, Observer { result ->
@@ -111,7 +106,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     override fun updateReceiveUI(selected: String?, isReceive: Boolean) {
         if (isReceive) {
             currency_receive_lbl?.text = selected
-            receive_text.text = "+ 0"
+            receive_text.text = getString(R.string.label_receive_amount_default)
         } else {
             currency_lbl.text = selected
         }
@@ -125,6 +120,11 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             sell_field.text.toString()
             , false
         )
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        viewModel.requestCurrenciesDispose()
     }
 
     companion object {

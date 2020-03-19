@@ -2,14 +2,20 @@ package com.paysera.currency.exchange.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.paysera.currency.exchange.client.model.CurrencyRatesResult
 import com.paysera.currency.exchange.client.repository.CurrencyRepository
+import com.paysera.currency.exchange.client.serviceModelToCurrency
 import com.paysera.currency.exchange.common.util.safeDispose
 import com.paysera.currency.exchange.common.viewmodel.BaseViewModel
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
 import com.paysera.currency.exchange.ui.R
 import com.paysera.currency.exchange.ui.model.BalanceItem
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import java.math.RoundingMode
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -21,15 +27,13 @@ class CurrencyViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private var payseraResponseDisposable: Disposable? = null
-    private var currenciesDisposable: Disposable? = null
-    private var computeDisposable: Disposable? = null
+    private var requestCurrenciesDisposable: Disposable? = null
     private var updateDisposable: Disposable? = null
+    private var computeDisposable: Disposable? = null
+
 
     private val _isComputing = MutableLiveData<Boolean>(true)
     val isComputing: LiveData<Boolean> get() = _isComputing
-
-    private val _currencies = MutableLiveData<ArrayList<String?>>()
-    val currencies: LiveData<ArrayList<String?>> get() = _currencies
 
     private val _errorMessage = MutableLiveData<Int?>()
     val errorMessage: LiveData<Int?> get() = _errorMessage
@@ -45,17 +49,31 @@ class CurrencyViewModel @Inject constructor(
 
     //Should come from the service response.
     private var commissionFee: Double = 0.7 // 0.7%
+    private var isUILoaded: Boolean = false
 
-    fun getPayseraResponse() {
-        currencyRepository.deleteCurrencies()
+    private fun getPayseraResponse() {
         payseraResponseDisposable = currencyRepository.getPayseraResponse()
             .doFinally {
-                getCurrencies()
+                if (!isUILoaded) {
+                    updateUI()
+                }
             }
             .subscribe(
                 {
                     if (it?.rates.toString().isNullOrEmpty())
                         _errorMessage.postValue(R.string.error_network_connection)
+                    if (!isUILoaded) {
+                        var list = currencyRepository.currencyList()
+                        currencyRepository.loadBase(
+                            CurrencyRatesResult(
+                                list[0].currency,
+                                list[0].currencyValue,
+                                list[0].currencyBalance,
+                                list[0].isAvailable,
+                                list[0].isBase
+                            )
+                        )
+                    }
                     payseraResponseDisposable?.safeDispose()
                 },
                 {
@@ -65,16 +83,24 @@ class CurrencyViewModel @Inject constructor(
             )
     }
 
-    private fun getCurrencies() {
-        currenciesDisposable = currencyRepository.queryCurrencies()
-            .subscribe({ result ->
-                parseBalanceList(result, false)
-                _errorMessage.postValue(R.string.currencies_message)
-                currenciesDisposable?.safeDispose()
-            }, {
-                _errorMessage.postValue(R.string.error_database)
-                currenciesDisposable?.safeDispose()
-            })
+
+    fun requestCurrencies() {
+        requestCurrenciesDisposable =
+            Observable.timer(5000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .repeat()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    getPayseraResponse()
+                }
+    }
+
+    fun requestCurrenciesDispose() {
+        requestCurrenciesDisposable.safeDispose()
+    }
+
+    fun currencies(): ArrayList<String?> {
+        return currencyRepository.currencies()
     }
 
     fun computeConvertedBalance(
@@ -88,7 +114,9 @@ class CurrencyViewModel @Inject constructor(
         val fromBal: Double = fromBalance?.toDouble() ?: 0.0
         val toBal: Double = toBalance?.toDoubleOrNull() ?: 0.0
 
-        if (toBal > fromBal || toBal == 0.0 || fromCurrency.equals(toCurrency)) {
+        val list = currencyRepository.currencyList()
+
+        if (toBal > fromBal || toBal == 0.0 || fromCurrency.equals(toCurrency) || list.isEmpty()) {
             _errorMessage.postValue(R.string.invalid_message)
             return
         }
@@ -110,7 +138,11 @@ class CurrencyViewModel @Inject constructor(
                         val totalFromBaseBalance =
                             toBal.let { fromBaseBalance?.currencyBalance?.toDouble()?.minus(it) }
 
-                        val selectedCurrBal = result.find { currencyEntity: CurrencyEntity ->
+                        val selectedCurrBal = list.find { currencyEntity: CurrencyEntity ->
+                            currencyEntity.currency.equals(toCurrency)
+                        }
+
+                        val toBaseBalance = result.find { currencyEntity: CurrencyEntity ->
                             currencyEntity.currency.equals(toCurrency)
                         }
 
@@ -147,20 +179,45 @@ class CurrencyViewModel @Inject constructor(
                         } else {
 
                             // Update DB for base currency.
-                            currencyRepository.updateFromCurrencyEntity(
-                                fromCurrency,
-                                convertDoubleToBigDecimal(totalFromBaseBalance), true
+                            currencyRepository.insertOrUpdate(
+                                CurrencyRatesResult(
+                                    fromCurrency, selectedCurrBal?.currencyValue,
+                                    convertDoubleToBigDecimal(totalFromBaseBalance), true, false
+                                ).serviceModelToCurrency()
                             )
 
-                            val total =
-                                computedWithCommissionFee?.plus(
-                                    selectedCurrBal?.currencyBalance?.toDouble() ?: 0.0
+                            if (toBaseBalance != null) {
+                                val total = computedWithCommissionFee?.plus(
+                                    toBaseBalance.currencyBalance?.toDouble() ?: 0.0
                                 )
-                            _currencyReceive.postValue(convertDoubleToBigDecimal(total))
-                            // Update DB for the converted currency.
-                            currencyRepository.updateToCurrencyEntity(
-                                toCurrency, convertDoubleToBigDecimal(total), true
-                            )
+
+                                _currencyReceive.postValue(convertDoubleToBigDecimal(total))
+                                // Update DB for the converted currency.
+                                currencyRepository.insertOrUpdate(
+                                    CurrencyRatesResult(
+                                        toBaseBalance.currency,
+                                        selectedCurrBal?.currencyValue,
+                                        convertDoubleToBigDecimal(total),
+                                        true,
+                                        false
+                                    ).serviceModelToCurrency()
+                                )
+                            } else {
+                                _currencyReceive.postValue(
+                                    convertDoubleToBigDecimal(
+                                        computedWithCommissionFee
+                                    )
+                                )
+                                currencyRepository.insertOrUpdate(
+                                    CurrencyRatesResult(
+                                        selectedCurrBal?.currency,
+                                        selectedCurrBal?.currencyValue,
+                                        convertDoubleToBigDecimal(computedWithCommissionFee),
+                                        true,
+                                        false
+                                    ).serviceModelToCurrency()
+                                )
+                            }
                             _isComputing.postValue(false)
                         }
                     }
@@ -179,7 +236,7 @@ class CurrencyViewModel @Inject constructor(
     fun updateUI() {
         updateDisposable = currencyRepository.queryCurrencies()
             .subscribe({ result ->
-                parseBalanceList(result, true)
+                parseBalanceList(result)
                 updateDisposable?.safeDispose()
             }, {
                 _errorMessage.postValue(R.string.error_database)
@@ -187,8 +244,7 @@ class CurrencyViewModel @Inject constructor(
             })
     }
 
-    private fun parseBalanceList(result: List<CurrencyEntity>, isCurrencyLoaded: Boolean) {
-        var mCurrencies = ArrayList<String?>()
+    private fun parseBalanceList(result: List<CurrencyEntity>) {
         var list: MutableList<BalanceItem> = ArrayList()
         result.forEach { currencyEntity: CurrencyEntity ->
             if (currencyEntity.isAvailable) list.add(
@@ -197,15 +253,14 @@ class CurrencyViewModel @Inject constructor(
                     currencyEntity.currencyBalance
                 )
             )
-            if (!isCurrencyLoaded) mCurrencies.add(currencyEntity.currency)
         }
-        if (!isCurrencyLoaded) {
-            _currencies.postValue(mCurrencies)
-        }
-        if (list.isEmpty()) {
-            getPayseraResponse()
-        } else {
-            _balanceListResult.postValue(list)
-        }
+
+        if (list.isNotEmpty()) isUILoaded = true
+        _balanceListResult.postValue(list)
+    }
+
+    fun deleteData() {
+        isUILoaded = false
+        currencyRepository.deleteCurrencies()
     }
 }

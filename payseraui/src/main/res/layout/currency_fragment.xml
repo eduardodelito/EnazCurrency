@@ -159,7 +159,7 @@
                     android:layout_marginEnd="@dimen/label_margin_10"
                     android:gravity="end"
                     android:paddingRight="@dimen/label_padding_5"
-                    android:text="@string/label_amount_default"
+                    android:text="@string/label_receive_amount_default"
                     android:textColor="@color/lime_green"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/currency_receive_lbl"

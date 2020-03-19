@@ -10,4 +10,5 @@ import retrofit2.http.GET
 interface PayseraApiService {
     @GET("latest/")
     fun getCurrencies(): Observable<PayseraResponse>
+
 }
