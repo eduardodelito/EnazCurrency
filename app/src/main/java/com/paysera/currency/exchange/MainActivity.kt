@@ -17,7 +17,7 @@ class MainActivity : DaggerAppCompatActivity(), CurrencyFragment.OnCurrencyFragm
         setContentView(R.layout.activity_main)
         if (layout_container is FrameLayout) {
             CurrencyFragment.newInstance().navigate(supportFragmentManager, R.id.layout_container, false)
-            progressBar.show(this,getString(R.string.please_wait))
+            progressBar.show(this,getString(R.string.dialog_title))
         }
     }
 
