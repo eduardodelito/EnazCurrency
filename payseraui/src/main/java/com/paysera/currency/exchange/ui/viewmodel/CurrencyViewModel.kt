@@ -53,6 +53,9 @@ class CurrencyViewModel @Inject constructor(
     private var commissionFee: Double = 0.7 // 0.7%
     private var isUILoaded: Boolean = false
 
+    /**
+     * Request to the Currency Exchange Rate API.
+     */
     private fun getPayseraResponse() {
         payseraResponseDisposable = currencyRepository.getPayseraResponse()
             .doFinally {
@@ -83,10 +86,13 @@ class CurrencyViewModel @Inject constructor(
             )
     }
 
-
+    /**
+     * Request Currency Exchange Rate API.
+     * Run request every 5 Seconds.
+     */
     fun requestCurrencies() {
         requestCurrenciesDisposable =
-            Observable.timer(5000, TimeUnit.MILLISECONDS)
+            Observable.timer(5, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .repeat()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -95,14 +101,28 @@ class CurrencyViewModel @Inject constructor(
                 }
     }
 
+    /**
+     * Dispose running request.
+     */
     fun requestCurrenciesDispose() {
         requestCurrenciesDisposable.safeDispose()
     }
 
+    /**
+     * Currency list store in the container.
+     */
     fun currencies(): ArrayList<String?> {
         return currencyRepository.currencies()
     }
 
+    /**
+     * Submit conversion
+     * @param fromCurrency from base currency.
+     * @param toCurrency to target currency.
+     * @param fromBalance from base currency amount.
+     * @param toBalance to target currency amount.
+     * @param initial true for confirmation, false for final conversion.
+     */
     fun computeConvertedBalance(
         fromCurrency: String?,
         toCurrency: String?,
@@ -224,10 +244,18 @@ class CurrencyViewModel @Inject constructor(
                 })
     }
 
+    /**
+     * Convert amount to BigDecimal.
+     * Set scale to 2 and Rounding mode.
+     */
     private fun convertDoubleToBigDecimal(amount: Double?): String {
         return amount?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString()
     }
 
+    /**
+     * Update UI once list added/removed.
+     * Get fresh data from db.
+     */
     fun updateUI() {
         updateDisposable = currencyRepository.queryCurrencies()
             .subscribe({ result ->
@@ -239,6 +267,9 @@ class CurrencyViewModel @Inject constructor(
             })
     }
 
+    /**
+     * Parse list from from db.
+     */
     private fun parseBalanceList(result: List<CurrencyEntity>) {
         var list: MutableList<BalanceItem> = ArrayList()
         result.forEach { currencyEntity: CurrencyEntity ->
@@ -257,6 +288,9 @@ class CurrencyViewModel @Inject constructor(
         _balanceListResult.postValue(list)
     }
 
+    /**
+     * Delete store data from CurrencyEntity db table.
+     */
     fun deleteData() {
         isUILoaded = false
         currencyRepository.deleteCurrencies()

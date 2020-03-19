@@ -70,6 +70,9 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         super.onCreateOptionsMenu(menu, menuInflater)
     }
 
+    /**
+     * Option menu to delete data list.
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle presses on the action bar menu items
         when (item.itemId) {
@@ -83,6 +86,9 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         return super.onOptionsItemSelected(item)
     }
 
+    /**
+     * Subscribe view model via observer.
+     */
     override fun subscribeUi() {
         with(viewModel) {
 
@@ -112,6 +118,9 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         }
     }
 
+    /**
+     * Update UI currency labels.
+     */
     override fun updateReceiveUI(selected: String?, isReceive: Boolean) {
         if (isReceive) {
             currency_receive_lbl?.text = selected
@@ -121,6 +130,9 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         }
     }
 
+    /**
+     * Update UI after dialog confirmation and continue the conversion.
+     */
     override fun updateBalanceUI() {
         viewModel.computeConvertedBalance(
             currency_lbl.text.toString(),

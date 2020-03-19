@@ -32,7 +32,6 @@ interface CurrencyRepository {
     fun insertOrUpdate(currency: CurrencyEntity)
 
     fun loadBase(currencyRatesResult: CurrencyRatesResult)
-
 }
 
 class CurrencyRepositoryImpl(
@@ -46,6 +45,9 @@ class CurrencyRepositoryImpl(
     private var currencyList = ArrayList<CurrencyRatesResult>()
     private var mCurrencies = ArrayList<String?>()
 
+    /**
+     * Request to the Currency Exchange Rate API.
+     */
     override fun getPayseraResponse(): Observable<PayseraResponse> =
         apiClient.getService().getCurrencies()
             .subscribeOn(Schedulers.io())
@@ -54,6 +56,9 @@ class CurrencyRepositoryImpl(
                 currencyListResult(it?.base, it?.rates)
             }
 
+    /**
+     * Store base currency into CurrencyEntity table.
+     */
     override fun loadBase(currencyRatesResult: CurrencyRatesResult) {
         queryCurrenciesDisposable = queryCurrencies()
             .subscribe({ result ->
@@ -66,10 +71,19 @@ class CurrencyRepositoryImpl(
             })
     }
 
+    /**
+     * CurrencyEntity list store in the container.
+     */
     override fun currencyList(): List<CurrencyEntity> = currencyList.serviceModelToCurrencyEntity()
 
+    /**
+     * Currency list store in the container.
+     */
     override fun currencies(): ArrayList<String?> = mCurrencies
 
+    /**
+     * Delete currency list from the database
+     */
     override fun deleteCurrencies() {
         deleteCurrencyDisposable = Observable.fromCallable {
                 currencyDao.deleteCurrencies()
@@ -79,6 +93,11 @@ class CurrencyRepositoryImpl(
             .subscribe { deleteCurrencyDisposable?.safeDispose() }
     }
 
+    /**
+     * Parse currencies response from API.
+     * @param base currency EUR.
+     * @param rateList currencies and rates.
+     */
     private fun currencyListResult(base: String?, rateList: Any?): ArrayList<CurrencyRatesResult> {
         val jObject = JSONObject(rateList.toString())
         val keys: Iterator<String> = jObject.keys()
@@ -100,10 +119,17 @@ class CurrencyRepositoryImpl(
         return currencyList
     }
 
+    /**
+     * Query currency list from the database.
+     */
     override fun queryCurrencies(): Observable<List<CurrencyEntity>> =
         currencyDao.getAllCurrencies().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
+    /**
+     * Insert or Update item from the database.
+     * @param currency item CurrencyEntity
+     */
     override fun insertOrUpdate(currency: CurrencyEntity) {
         insertCurrencyDisposable = Observable.fromCallable {
                 currencyDao.insertOrUpdate(currency)
