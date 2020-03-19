@@ -12,9 +12,7 @@ fun List<CurrencyRatesResult>.serviceModelToCurrencyEntity(): List<CurrencyEntit
             id = 0,
             currency = it.currency,
             currencyValue = it.currencyValue,
-            currencyBalance = it.currencyBalance,
-            isAvailable = it.isAvailable,
-            isBase = it.isBase
+            currencyBalance = it.currencyBalance
         )
     }
 }
@@ -24,8 +22,6 @@ fun CurrencyRatesResult.serviceModelToCurrency(): CurrencyEntity {
             id = 0,
             currency = currency,
             currencyValue = currencyValue,
-            currencyBalance = currencyBalance,
-            isAvailable = isAvailable,
-            isBase = isBase
+            currencyBalance = currencyBalance
         )
 }

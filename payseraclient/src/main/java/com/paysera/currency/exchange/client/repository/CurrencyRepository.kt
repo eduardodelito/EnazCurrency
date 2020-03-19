@@ -13,7 +13,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by eduardo.delito on 3/11/20.
@@ -21,8 +20,6 @@ import java.util.concurrent.TimeUnit
 interface CurrencyRepository {
 
     fun getPayseraResponse(): Observable<PayseraResponse>
-
-    fun saveCurrencies(rates: Any?, base: String?)
 
     fun deleteCurrencies()
 
@@ -44,10 +41,7 @@ class CurrencyRepositoryImpl(
 ) : CurrencyRepository {
 
     private var queryCurrenciesDisposable: Disposable? = null
-    private var saveCurrencyDisposable: Disposable? = null
     private var deleteCurrencyDisposable: Disposable? = null
-    private var updateFromCurrencyDisposable: Disposable? = null
-    private var updateToCurrencyDisposable: Disposable? = null
     private var insertCurrencyDisposable: Disposable? = null
     private var currencyList = ArrayList<CurrencyRatesResult>()
     private var mCurrencies = ArrayList<String?>()
@@ -76,22 +70,6 @@ class CurrencyRepositoryImpl(
 
     override fun currencies(): ArrayList<String?> = mCurrencies
 
-    override fun saveCurrencies(rates: Any?, base: String?) {
-        saveCurrencyDisposable = Observable.fromCallable {
-                rates?.let { rateList ->
-                    currencyDao.insertCurrencies(
-                        currencyListResult(
-                            base,
-                            rateList
-                        ).serviceModelToCurrencyEntity()
-                    )
-                }
-            }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { saveCurrencyDisposable?.safeDispose() }
-    }
-
     override fun deleteCurrencies() {
         deleteCurrencyDisposable = Observable.fromCallable {
                 currencyDao.deleteCurrencies()
@@ -107,7 +85,7 @@ class CurrencyRepositoryImpl(
         mCurrencies.clear()
         mCurrencies.add(base)
         currencyList.clear()
-        currencyList.add(CurrencyRatesResult(base, "1", "1000", true, true))
+        currencyList.add(CurrencyRatesResult(base, "1", "1000"))
         while (keys.hasNext()) {
             val key = keys.next()
             mCurrencies.add(key)
@@ -115,9 +93,7 @@ class CurrencyRepositoryImpl(
                 CurrencyRatesResult(
                     key,
                     jObject.getString(key),
-                    "0",
-                    false,
-                    false
+                    "0"
                 )
             )
         }

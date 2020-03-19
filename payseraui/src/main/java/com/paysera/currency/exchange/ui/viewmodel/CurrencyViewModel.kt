@@ -70,9 +70,7 @@ class CurrencyViewModel @Inject constructor(
                             CurrencyRatesResult(
                                 list[0].currency,
                                 list[0].currencyValue,
-                                list[0].currencyBalance,
-                                list[0].isAvailable,
-                                list[0].isBase
+                                list[0].currencyBalance
                             )
                         )
                     }
@@ -156,7 +154,7 @@ class CurrencyViewModel @Inject constructor(
                             }
 
                         val isCommissionFeeApplied =
-                            result.filter { currencyEntity: CurrencyEntity -> currencyEntity.isAvailable }.size
+                            result.size
 
                         var computedWithCommissionFee: Double?
 
@@ -184,8 +182,7 @@ class CurrencyViewModel @Inject constructor(
                             currencyRepository.insertOrUpdate(
                                 CurrencyRatesResult(
                                     fromCurrency, selectedCurrBal?.currencyValue,
-                                    convertDoubleToBigDecimal(totalFromBaseBalance), true, false
-                                ).serviceModelToCurrency()
+                                    convertDoubleToBigDecimal(totalFromBaseBalance)).serviceModelToCurrency()
                             )
 
                             if (toBaseBalance != null) {
@@ -199,9 +196,7 @@ class CurrencyViewModel @Inject constructor(
                                     CurrencyRatesResult(
                                         toBaseBalance.currency,
                                         selectedCurrBal?.currencyValue,
-                                        convertDoubleToBigDecimal(total),
-                                        true,
-                                        false
+                                        convertDoubleToBigDecimal(total)
                                     ).serviceModelToCurrency()
                                 )
                             } else {
@@ -214,9 +209,7 @@ class CurrencyViewModel @Inject constructor(
                                     CurrencyRatesResult(
                                         selectedCurrBal?.currency,
                                         selectedCurrBal?.currencyValue,
-                                        convertDoubleToBigDecimal(computedWithCommissionFee),
-                                        true,
-                                        false
+                                        convertDoubleToBigDecimal(computedWithCommissionFee)
                                     ).serviceModelToCurrency()
                                 )
                             }
@@ -249,7 +242,7 @@ class CurrencyViewModel @Inject constructor(
     private fun parseBalanceList(result: List<CurrencyEntity>) {
         var list: MutableList<BalanceItem> = ArrayList()
         result.forEach { currencyEntity: CurrencyEntity ->
-            if (currencyEntity.isAvailable) list.add(
+            list.add(
                 BalanceItem(
                     currencyEntity.currency,
                     currencyEntity.currencyBalance
