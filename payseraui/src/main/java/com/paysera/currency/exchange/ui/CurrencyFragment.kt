@@ -1,5 +1,6 @@
 package com.paysera.currency.exchange.ui
 
+import android.content.Context
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -27,7 +28,10 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
 
     private lateinit var balancesAdapter: BalancesAdapter
 
+    private var mListener: OnCurrencyFragmentListener? = null
+
     override fun initData() {
+        mListener?.showProgressBar()
         viewModel.requestCurrencies()
     }
 
@@ -70,6 +74,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         // Handle presses on the action bar menu items
         when (item.itemId) {
             R.id.action_reset -> {
+                mListener?.showProgressBar()
                 viewModel.deleteData()
                 receive_text.text = "+ 0"
                 return true
@@ -100,6 +105,10 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             currencyReceive.observe(viewLifecycleOwner, Observer { receive ->
                 receive_text.text = "+ $receive"
             })
+
+            isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+                if (!isLoading) mListener?.hideProgressBar()
+            })
         }
     }
 
@@ -122,13 +131,36 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         )
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnCurrencyFragmentListener) {
+            mListener = context
+        }
+    }
+
     override fun onDetach() {
         super.onDetach()
+        mListener = null
         viewModel.requestCurrenciesDispose()
     }
 
     companion object {
         fun newInstance() =
             CurrencyFragment()
+    }
+
+    /**
+     * Interface to handle callbacks
+     * */
+    interface OnCurrencyFragmentListener {
+        /**
+         * Function to handle callback to show progress bar .
+         * */
+        fun showProgressBar()
+
+        /**
+         * Function to handle callback to hide progress bar .
+         * */
+        fun hideProgressBar()
     }
 }

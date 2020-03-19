@@ -20,13 +20,13 @@ import kotlinx.android.synthetic.main.progress_bar.view.*
 class CustomProgressBar {
     lateinit var dialog: Dialog
 
-    fun show(context: Context): Dialog {
+    fun show(context: Context?): Dialog {
         return show(context, null)
     }
 
-    fun show(context: Context, title: CharSequence?): Dialog {
-        val inflator = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = inflator.inflate(R.layout.progress_bar, null)
+    fun show(context: Context?, title: CharSequence?): Dialog {
+        val inflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = inflater.inflate(R.layout.progress_bar, null)
         if (title != null) {
             view.cp_title.text = title
         }
@@ -40,6 +40,7 @@ class CustomProgressBar {
 
         dialog = Dialog(context, R.style.CustomProgressBarTheme)
         dialog.setContentView(view)
+        dialog.setCancelable(false)
 
         return dialog
     }

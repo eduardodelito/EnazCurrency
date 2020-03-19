@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Paysera</string>
+    <string name="please_wait">Please wait...</string>
     <string name="reset">Reset</string>
 </resources>

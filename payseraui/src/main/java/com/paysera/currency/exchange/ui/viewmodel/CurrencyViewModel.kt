@@ -31,6 +31,8 @@ class CurrencyViewModel @Inject constructor(
     private var updateDisposable: Disposable? = null
     private var computeDisposable: Disposable? = null
 
+    private val _isLoading = MutableLiveData<Boolean>(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     private val _isComputing = MutableLiveData<Boolean>(true)
     val isComputing: LiveData<Boolean> get() = _isComputing
@@ -255,7 +257,10 @@ class CurrencyViewModel @Inject constructor(
             )
         }
 
-        if (list.isNotEmpty()) isUILoaded = true
+        if (list.isNotEmpty()) {
+            _isLoading.postValue(false)
+            isUILoaded = true
+        }
         _balanceListResult.postValue(list)
     }
 
