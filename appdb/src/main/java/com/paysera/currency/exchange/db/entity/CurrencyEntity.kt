@@ -15,5 +15,7 @@ data class CurrencyEntity (
 
     @ColumnInfo(name = "currency") var currency: String?,
     @ColumnInfo(name = "currencyValue") var currencyValue: String?,
-    @ColumnInfo(name = "currencyBalance") var currencyBalance: String?
+    @ColumnInfo(name = "currencyBalance") var currencyBalance: String?,
+    @ColumnInfo(name = "maxConversion") var maxConversion: String?,
+    @ColumnInfo(name = "transactionCount") var transactionCount: Int
 )

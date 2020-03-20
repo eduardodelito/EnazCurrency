@@ -32,6 +32,8 @@ interface CurrencyRepository {
     fun insertOrUpdate(currency: CurrencyEntity)
 
     fun loadBase(currencyRatesResult: CurrencyRatesResult)
+
+    fun commissionFeeLimit(): Int
 }
 
 class CurrencyRepositoryImpl(
@@ -44,6 +46,7 @@ class CurrencyRepositoryImpl(
     private var insertCurrencyDisposable: Disposable? = null
     private var currencyList = ArrayList<CurrencyRatesResult>()
     private var mCurrencies = ArrayList<String?>()
+    private var limit = 0
 
     /**
      * Request to the Currency Exchange Rate API.
@@ -53,6 +56,8 @@ class CurrencyRepositoryImpl(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {
+                //Limit can get from the service pass it or save into database. ex. it?.limit
+                limit = 2
                 currencyListResult(it?.base, it?.rates)
             }
 
@@ -81,6 +86,10 @@ class CurrencyRepositoryImpl(
      */
     override fun currencies(): ArrayList<String?> = mCurrencies
 
+    override fun commissionFeeLimit(): Int {
+        return limit
+    }
+
     /**
      * Delete currency list from the database
      */
@@ -104,7 +113,8 @@ class CurrencyRepositoryImpl(
         mCurrencies.clear()
         mCurrencies.add(base)
         currencyList.clear()
-        currencyList.add(CurrencyRatesResult(base, "1", "1000"))
+        // Max conversion can be modified from the service. Add default 1000.
+        currencyList.add(CurrencyRatesResult(base, "1", "1000", "1000", 0))
         while (keys.hasNext()) {
             val key = keys.next()
             mCurrencies.add(key)
@@ -112,7 +122,9 @@ class CurrencyRepositoryImpl(
                 CurrencyRatesResult(
                     key,
                     jObject.getString(key),
-                    "0"
+                    "0",
+                    "1000",
+                    0
                 )
             )
         }

@@ -21,14 +21,24 @@ interface CurrencyDao {
     @Query("SELECT * from CurrencyEntity WHERE currency= :currency")
     fun getCurrencyEntityByCurrency(currency: String?): List<CurrencyEntity>
 
-    @Query("UPDATE CurrencyEntity SET currencyBalance=:amount WHERE currency = :currency")
-    fun updateQuantity(currency: String?, amount: String?)
+    @Query("UPDATE CurrencyEntity SET currencyBalance=:amount, maxConversion=:maxConversion, transactionCount=:transactionCount WHERE currency = :currency")
+    fun updateQuantity(
+        currency: String?,
+        amount: String?,
+        maxConversion: String?,
+        transactionCount: Int
+    )
 
     @Transaction
     fun insertOrUpdate(currency: CurrencyEntity) {
         val currencyFromDB = getCurrencyEntityByCurrency(currency.currency)
 
         if (currencyFromDB.isEmpty()) insert(currency)
-        else updateQuantity(currency.currency, currency.currencyBalance)
+        else updateQuantity(
+            currency.currency,
+            currency.currencyBalance,
+            currency.maxConversion,
+            currency.transactionCount
+        )
     }
 }

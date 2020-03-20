@@ -73,7 +73,9 @@ class CurrencyViewModel @Inject constructor(
                             CurrencyRatesResult(
                                 list[0].currency,
                                 list[0].currencyValue,
-                                list[0].currencyBalance
+                                list[0].currencyBalance,
+                                list[0].maxConversion,
+                                list[0].transactionCount
                             )
                         )
                     }
@@ -135,8 +137,12 @@ class CurrencyViewModel @Inject constructor(
         val toBal: Double = toBalance?.toDoubleOrNull() ?: 0.0
 
         val list = currencyRepository.currencyList()
+        val maxConversion = list.find { currencyEntity: CurrencyEntity ->
+            currencyEntity.currency.equals(fromCurrency)
+        }?.maxConversion?.toDouble() ?: 0.0
 
-        if (toBal > fromBal || toBal == 0.0 || fromCurrency.equals(toCurrency) || list.isEmpty()) {
+
+        if (toBal > fromBal || toBal == 0.0 || fromCurrency.equals(toCurrency) || list.isEmpty() || fromBal > maxConversion) {
             _errorMessage.postValue(R.string.invalid_message)
             return
         }
@@ -173,12 +179,11 @@ class CurrencyViewModel @Inject constructor(
                                 )
                             }
 
-                        val isCommissionFeeApplied =
-                            result.size
-
                         var computedWithCommissionFee: Double?
 
-                        computedWithCommissionFee = if (isCommissionFeeApplied > 5) {
+                        val totalValueLimit: Int = result.map { it.transactionCount }.sum()
+
+                        computedWithCommissionFee = if (totalValueLimit >= currencyRepository.commissionFeeLimit()) {
                             val computeCommissionFeePercent = commissionFee.div(100)
                             val computeCommissionFee = subTotal?.times(computeCommissionFeePercent)
                             computeCommissionFee?.let { subTotal.minus(it) }
@@ -186,7 +191,7 @@ class CurrencyViewModel @Inject constructor(
                             subTotal
                         }
 
-                        val commissionFeeMessage = if (isCommissionFeeApplied > 5)
+                        val commissionFeeMessage = if (totalValueLimit >= currencyRepository.commissionFeeLimit())
                             "Commission Fee - $commissionFee% $fromCurrency" else ""
 
                         if (initial) {
@@ -202,7 +207,10 @@ class CurrencyViewModel @Inject constructor(
                             currencyRepository.insertOrUpdate(
                                 CurrencyRatesResult(
                                     fromCurrency, selectedCurrBal?.currencyValue,
-                                    convertDoubleToBigDecimal(totalFromBaseBalance)).serviceModelToCurrency()
+                                    convertDoubleToBigDecimal(totalFromBaseBalance),
+                                    selectedCurrBal?.maxConversion,
+                                    fromBaseBalance?.transactionCount ?: 0
+                                ).serviceModelToCurrency()
                             )
 
                             if (toBaseBalance != null) {
@@ -210,13 +218,17 @@ class CurrencyViewModel @Inject constructor(
                                     toBaseBalance.currencyBalance?.toDouble() ?: 0.0
                                 )
 
+                                val limit = toBaseBalance.transactionCount.plus(1)
+
                                 _currencyReceive.postValue(convertDoubleToBigDecimal(total))
                                 // Update DB for the converted currency.
                                 currencyRepository.insertOrUpdate(
                                     CurrencyRatesResult(
                                         toBaseBalance.currency,
                                         selectedCurrBal?.currencyValue,
-                                        convertDoubleToBigDecimal(total)
+                                        convertDoubleToBigDecimal(total),
+                                        toBaseBalance.maxConversion,
+                                        limit
                                     ).serviceModelToCurrency()
                                 )
                             } else {
@@ -229,7 +241,9 @@ class CurrencyViewModel @Inject constructor(
                                     CurrencyRatesResult(
                                         selectedCurrBal?.currency,
                                         selectedCurrBal?.currencyValue,
-                                        convertDoubleToBigDecimal(computedWithCommissionFee)
+                                        convertDoubleToBigDecimal(computedWithCommissionFee),
+                                        selectedCurrBal?.maxConversion,
+                                        1
                                     ).serviceModelToCurrency()
                                 )
                             }

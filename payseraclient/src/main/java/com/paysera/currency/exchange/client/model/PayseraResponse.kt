@@ -8,5 +8,7 @@ data class PayseraResponse(val rates: Any?, val base: String?, val date: String?
 data class CurrencyRatesResult(
     val currency: String?,
     val currencyValue: String?,
-    val currencyBalance: String?
+    val currencyBalance: String?,
+    val maxConversion: String?,
+    val transactionCount: Int
 )
