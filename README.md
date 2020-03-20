@@ -1,4 +1,4 @@
-# MyPaysera
+# Paysera
 Currency Exchanger
 Your homework task will be to create an application for exchanging currencies. Take a look how the app should look like at https://scene.zeplin.io/project/5da4169f760d2a2fb4b2ead9. Screen images are to get better understanding how everything should work and you don't have to make it look exactly the same. However, if you wish to use resources (images, colors) from the design please email us your Zeplin email.
 

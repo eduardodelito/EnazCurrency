@@ -1,2 +1,2 @@
 include ':app', ':appdb', ':common', ':payseraclient', ':payseraui'
-rootProject.name='MyPaysera'
+rootProject.name='Paysera'
