@@ -27,7 +27,6 @@ class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.binding.item = list[position]
-        holder.binding.executePendingBindings()
     }
 
     /**

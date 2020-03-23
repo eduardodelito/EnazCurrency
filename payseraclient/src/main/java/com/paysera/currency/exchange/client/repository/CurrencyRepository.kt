@@ -57,7 +57,7 @@ class CurrencyRepositoryImpl(
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {
                 //Limit can get from the service pass it or save into database. ex. it?.limit
-                limit = 2
+                limit = 5
                 currencyListResult(it?.base, it?.rates)
             }
 
