@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.paysera.currency.exchange.common.R
 import com.paysera.currency.exchange.common.viewmodel.BaseViewModel
 import dagger.android.support.DaggerFragment
 import java.lang.reflect.ParameterizedType
@@ -116,17 +117,17 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         var selected: String? = ""
         val listItems = currencies.toTypedArray<CharSequence?>()
         val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setTitle("Choose Currencies")
+        mBuilder?.setTitle(getString(R.string.choose_currencies_title))
         mBuilder?.setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
             dialogInterface.apply { selected = listItems[i].toString()}
         }
-        mBuilder?.setPositiveButton("Ok") {dialog, which  ->
+        mBuilder?.setPositiveButton(R.string.ok) {dialog, which  ->
             updateReceiveUI(selected, isReceive)
             dialog.cancel()
             which.or(-1)
         }
         // Set the neutral/cancel button click listener
-        mBuilder?.setNegativeButton("Cancel") { dialog, which ->
+        mBuilder?.setNegativeButton(R.string.cancel) { dialog, which ->
             // Do something when click the neutral button
             dialog.cancel()
             which.or(-2)
@@ -145,15 +146,15 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
      */
     fun submitDialog(message: String?) {
         val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setMessage("Are you sure you want to convert $message")
-        mBuilder?.setPositiveButton("Yes") {dialog, which  ->
+        mBuilder?.setMessage("${getString(R.string.are_you_sure_dialog)} $message")
+        mBuilder?.setPositiveButton(R.string.yes) {dialog, which  ->
             confirmationDialog(message)
             updateBalanceUI()
             dialog.cancel()
             which.or(-1)
         }
         // Set the neutral/cancel button click listener
-        mBuilder?.setNegativeButton("No") { dialog, which ->
+        mBuilder?.setNegativeButton(R.string.no) { dialog, which ->
             // Do something when click the neutral button
             dialog.cancel()
             which.or(-2)
@@ -167,14 +168,14 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
      */
     private fun confirmationDialog(message: String?) {
         val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setTitle("Currency Converted")
-        mBuilder?.setMessage("You have converted  $message.")
-        mBuilder?.setPositiveButton("Ok") {dialog, which  ->
+        mBuilder?.setTitle(getString(R.string.currency_converted))
+        mBuilder?.setMessage("${getString(R.string.you_have_converted)} $message")
+        mBuilder?.setPositiveButton(R.string.ok) {dialog, which  ->
             dialog.cancel()
             which.or(-1)
         }
         // Set the neutral/cancel button click listener
-        mBuilder?.setNegativeButton("Cancel") { dialog, which ->
+        mBuilder?.setNegativeButton(R.string.cancel) { dialog, which ->
             // Do something when click the neutral button
             dialog.cancel()
             which.or(-2)

@@ -7,4 +7,13 @@
     <string name="success_message">Conversion list updated.</string>
     <string name="currencies_message">Currencies loaded successfully.</string>
     <string name="invalid_message">Invalid amount.</string>
+
+    <string name="choose_currencies_title">Choose Currencies</string>
+    <string name="are_you_sure_dialog">Are you sure you want to convert</string>
+    <string name="currency_converted">Currency Converted</string>
+    <string name="you_have_converted">You have converted</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 </resources>

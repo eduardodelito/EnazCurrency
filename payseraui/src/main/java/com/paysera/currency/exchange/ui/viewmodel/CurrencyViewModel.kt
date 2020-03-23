@@ -199,7 +199,7 @@ class CurrencyViewModel @Inject constructor(
                             _dialogMessage.postValue(
                                 " ${convertDoubleToBigDecimal(toBal)} $fromCurrency to ${convertDoubleToBigDecimal(
                                     computedWithCommissionFee
-                                )} $toCurrency? $commissionFeeMessage"
+                                )} $toCurrency. $commissionFeeMessage"
                             )
                         } else {
 
