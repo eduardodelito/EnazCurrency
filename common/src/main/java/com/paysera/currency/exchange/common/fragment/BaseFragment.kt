@@ -145,7 +145,7 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
      */
     fun submitDialog(message: String?) {
         val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setMessage("Are you sure you want to convert $message?")
+        mBuilder?.setMessage("Are you sure you want to convert $message")
         mBuilder?.setPositiveButton("Yes") {dialog, which  ->
             confirmationDialog(message)
             updateBalanceUI()

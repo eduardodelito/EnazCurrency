@@ -192,14 +192,14 @@ class CurrencyViewModel @Inject constructor(
                         }
 
                         val commissionFeeMessage = if (totalValueLimit >= currencyRepository.commissionFeeLimit())
-                            "Commission Fee - $commissionFee% $fromCurrency" else ""
+                            "Commission Fee - $commissionFee% $fromCurrency." else ""
 
                         if (initial) {
 
                             _dialogMessage.postValue(
-                                "From ${convertDoubleToBigDecimal(toBal)} $fromCurrency to ${convertDoubleToBigDecimal(
+                                " ${convertDoubleToBigDecimal(toBal)} $fromCurrency to ${convertDoubleToBigDecimal(
                                     computedWithCommissionFee
-                                )} $toCurrency. $commissionFeeMessage"
+                                )} $toCurrency? $commissionFeeMessage"
                             )
                         } else {
 
