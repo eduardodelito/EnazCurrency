@@ -183,16 +183,19 @@ class CurrencyViewModel @Inject constructor(
 
                         val totalValueLimit: Int = result.map { it.transactionCount }.sum()
 
-                        computedWithCommissionFee = if (totalValueLimit >= currencyRepository.commissionFeeLimit()) {
-                            val computeCommissionFeePercent = commissionFee.div(100)
-                            val computeCommissionFee = subTotal?.times(computeCommissionFeePercent)
-                            computeCommissionFee?.let { subTotal.minus(it) }
-                        } else {
-                            subTotal
-                        }
+                        computedWithCommissionFee =
+                            if (totalValueLimit >= currencyRepository.commissionFeeLimit()) {
+                                val computeCommissionFeePercent = commissionFee.div(100)
+                                val computeCommissionFee =
+                                    subTotal?.times(computeCommissionFeePercent)
+                                computeCommissionFee?.let { subTotal.minus(it) }
+                            } else {
+                                subTotal
+                            }
 
-                        val commissionFeeMessage = if (totalValueLimit >= currencyRepository.commissionFeeLimit())
-                            "Commission Fee - $commissionFee% $fromCurrency." else ""
+                        val commissionFeeMessage =
+                            if (totalValueLimit >= currencyRepository.commissionFeeLimit())
+                                "Commission Fee - $commissionFee% $fromCurrency." else ""
 
                         if (initial) {
 
@@ -220,7 +223,11 @@ class CurrencyViewModel @Inject constructor(
 
                                 val limit = toBaseBalance.transactionCount.plus(1)
 
-                                _currencyReceive.postValue(convertDoubleToBigDecimal(total))
+                                _currencyReceive.postValue(
+                                    convertDoubleToBigDecimal(
+                                        computedWithCommissionFee
+                                    )
+                                )
                                 // Update DB for the converted currency.
                                 currencyRepository.insertOrUpdate(
                                     CurrencyRatesResult(
@@ -263,7 +270,8 @@ class CurrencyViewModel @Inject constructor(
      * Set scale to 2 and Rounding mode.
      */
     private fun convertDoubleToBigDecimal(amount: Double?): String {
-        return amount?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString()
+        return amount?.toBigDecimal()?.setScale(5, RoundingMode.HALF_UP)?.stripTrailingZeros()
+            .toString()
     }
 
     /**

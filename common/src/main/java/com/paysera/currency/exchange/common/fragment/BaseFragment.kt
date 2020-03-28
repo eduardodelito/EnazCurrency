@@ -155,7 +155,6 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         }
         // Set the neutral/cancel button click listener
         mBuilder?.setNegativeButton(R.string.no) { dialog, which ->
-            // Do something when click the neutral button
             dialog.cancel()
             which.or(-2)
         }
@@ -176,7 +175,6 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         }
         // Set the neutral/cancel button click listener
         mBuilder?.setNegativeButton(R.string.cancel) { dialog, which ->
-            // Do something when click the neutral button
             dialog.cancel()
             which.or(-2)
         }
