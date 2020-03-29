@@ -172,12 +172,16 @@ class CurrencyViewModel @Inject constructor(
                             currencyEntity.currency.equals(toCurrency)
                         }
 
-                        val subTotal =
-                            selectedCurrBal?.currencyValue?.toDouble()?.let {
-                                toBal.times(
-                                    it
-                                )
+                        val subTotal = selectedCurrBal?.currencyValue?.toDouble()?.let {
+                            toCurrency?.let { fromCurr ->
+                                fromBaseBalance?.currencyValue?.toDouble()?.let { fromBalValue ->
+                                    convert(
+                                        fromCurr, toBal,
+                                        it, fromBalValue
+                                    )
+                                }
                             }
+                        }
 
                         var computedWithCommissionFee: Double?
 
@@ -200,9 +204,7 @@ class CurrencyViewModel @Inject constructor(
                         if (initial) {
 
                             _dialogMessage.postValue(
-                                " ${convertDoubleToBigDecimal(toBal)} $fromCurrency to ${convertDoubleToBigDecimal(
-                                    computedWithCommissionFee
-                                )} $toCurrency. $commissionFeeMessage"
+                                " $toBal $fromCurrency to $computedWithCommissionFee $toCurrency. $commissionFeeMessage"
                             )
                         } else {
 
@@ -210,7 +212,7 @@ class CurrencyViewModel @Inject constructor(
                             currencyRepository.insertOrUpdate(
                                 CurrencyRatesResult(
                                     fromCurrency, selectedCurrBal?.currencyValue,
-                                    convertDoubleToBigDecimal(totalFromBaseBalance),
+                                    totalFromBaseBalance.toString(),
                                     selectedCurrBal?.maxConversion,
                                     fromBaseBalance?.transactionCount ?: 0
                                 ).serviceModelToCurrency()
@@ -223,32 +225,24 @@ class CurrencyViewModel @Inject constructor(
 
                                 val limit = toBaseBalance.transactionCount.plus(1)
 
-                                _currencyReceive.postValue(
-                                    convertDoubleToBigDecimal(
-                                        computedWithCommissionFee
-                                    )
-                                )
+                                _currencyReceive.postValue(convertDoubleToBigDecimal(computedWithCommissionFee))
                                 // Update DB for the converted currency.
                                 currencyRepository.insertOrUpdate(
                                     CurrencyRatesResult(
                                         toBaseBalance.currency,
                                         selectedCurrBal?.currencyValue,
-                                        convertDoubleToBigDecimal(total),
+                                        total.toString(),
                                         toBaseBalance.maxConversion,
                                         limit
                                     ).serviceModelToCurrency()
                                 )
                             } else {
-                                _currencyReceive.postValue(
-                                    convertDoubleToBigDecimal(
-                                        computedWithCommissionFee
-                                    )
-                                )
+                                _currencyReceive.postValue(convertDoubleToBigDecimal(computedWithCommissionFee))
                                 currencyRepository.insertOrUpdate(
                                     CurrencyRatesResult(
                                         selectedCurrBal?.currency,
                                         selectedCurrBal?.currencyValue,
-                                        convertDoubleToBigDecimal(computedWithCommissionFee),
+                                        computedWithCommissionFee.toString(),
                                         selectedCurrBal?.maxConversion,
                                         1
                                     ).serviceModelToCurrency()
@@ -270,8 +264,28 @@ class CurrencyViewModel @Inject constructor(
      * Set scale to 2 and Rounding mode.
      */
     private fun convertDoubleToBigDecimal(amount: Double?): String {
-        return amount?.toBigDecimal()?.setScale(5, RoundingMode.HALF_UP)?.stripTrailingZeros()
-            .toString()
+        return amount?.toBigDecimal()?.setScale(2, RoundingMode.HALF_UP).toString()
+    }
+
+    /**
+     * Converter method
+     * @param base from the selected currency.
+     * @param fromAmount from the selected currency amount.
+     * @param toCurrencyValue to the currency conversion value.
+     */
+    private fun convert(
+        base: String,
+        fromAmount: Double,
+        toCurrencyValue: Double,
+        fromCurrencyValue: Double
+    ): Double {
+        val toAmount: Double
+        if (base == "EUR") {
+            toAmount = fromAmount.div(fromCurrencyValue)
+        } else {
+            toAmount = fromAmount.times(toCurrencyValue)
+        }
+        return toAmount
     }
 
     /**
@@ -298,7 +312,7 @@ class CurrencyViewModel @Inject constructor(
             list.add(
                 BalanceItem(
                     currencyEntity.currency,
-                    currencyEntity.currencyBalance
+                    convertDoubleToBigDecimal(currencyEntity.currencyBalance?.toDouble())
                 )
             )
         }
