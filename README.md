@@ -17,16 +17,45 @@ Currency exchange rates should be synchronized every 5 seconds
 URI: https://api.exchangeratesapi.io/latest
 
 Response example:
-
 {
   "rates": {
-    "JPY": 118.52,
-    "USD": 1.103,
-    "GBP": 0.90155
+    "CAD": 1.5521,
+    "HKD": 8.5095,
+    "ISK": 154.0,
+    "PHP": 56.125,
+    "DKK": 7.4606,
+    "HUF": 355.65,
+    "CZK": 27.299,
+    "AUD": 1.8209,
+    "RON": 4.8375,
+    "SEK": 11.0158,
+    "IDR": 17716.88,
+    "INR": 82.8695,
+    "BRL": 5.5905,
+    "RUB": 86.3819,
+    "HRK": 7.614,
+    "JPY": 119.36,
+    "THB": 35.769,
+    "CHF": 1.0581,
+    "SGD": 1.5762,
+    "PLN": 4.5306,
+    "BGN": 1.9558,
+    "TRY": 7.0935,
+    "CNY": 7.7894,
+    "NOK": 11.6558,
+    "NZD": 1.8548,
+    "ZAR": 19.3415,
+    "USD": 1.0977,
+    "MXN": 25.8329,
+    "ILS": 3.9413,
+    "GBP": 0.89743,
+    "KRW": 1346.31,
+    "MYR": 4.7619
   },
   "base": "EUR",
-  "date": "2019-10-10"
+  "date": "2020-03-27"
 }
+
 Requirements
 the task must be done in Kotlin
 there are no strict restrictions on time
