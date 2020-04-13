@@ -10,6 +10,7 @@ import com.paysera.currency.exchange.common.viewmodel.BaseViewModel
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
 import com.paysera.currency.exchange.ui.R
 import com.paysera.currency.exchange.ui.model.BalanceItem
+import com.paysera.currency.exchange.ui.model.DialogContentItem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -40,8 +41,8 @@ class CurrencyViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<Int?>()
     val errorMessage: LiveData<Int?> get() = _errorMessage
 
-    private val _dialogMessage = MutableLiveData<String?>()
-    val dialogMessage: LiveData<String?> get() = _dialogMessage
+    private val _dialogMessage = MutableLiveData<DialogContentItem?>()
+    val dialogMessage: LiveData<DialogContentItem?> get() = _dialogMessage
 
     private val _balanceListResult = MutableLiveData<MutableList<BalanceItem>>()
     val balanceListResult: LiveData<MutableList<BalanceItem>> get() = _balanceListResult
@@ -200,12 +201,9 @@ class CurrencyViewModel @Inject constructor(
                         val commissionFeeMessage =
                             if (totalValueLimit >= currencyRepository.commissionFeeLimit())
                                 "Commission Fee - $commissionFee% $fromCurrency." else ""
-
+                        val message = "$toBal $fromCurrency to $computedWithCommissionFee $toCurrency"
                         if (initial) {
-
-                            _dialogMessage.postValue(
-                                " $toBal $fromCurrency to $computedWithCommissionFee $toCurrency. $commissionFeeMessage"
-                            )
+                            _dialogMessage.postValue(DialogContentItem("Confirmation", R.string.are_you_sure_dialog, " $message? $commissionFeeMessage", "alertInitial", false))
                         } else {
 
                             // Update DB for base currency.
@@ -248,6 +246,7 @@ class CurrencyViewModel @Inject constructor(
                                     ).serviceModelToCurrency()
                                 )
                             }
+                            _dialogMessage.postValue(DialogContentItem("Congratulations", R.string.you_have_converted, " $message. $commissionFeeMessage", "alertDone", true))
                             _isComputing.postValue(false)
                         }
                     }

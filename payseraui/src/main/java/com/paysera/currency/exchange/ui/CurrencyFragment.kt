@@ -51,14 +51,18 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             showDialog(viewModel.currencies(), true)
         }
         submit_button.setOnClickListener {
-            viewModel.computeConvertedBalance(
-                currency_lbl.text.toString(),
-                currency_receive_lbl.text.toString(),
-                balancesAdapter.getBaseBalance(currency_lbl.text.toString()),
-                sell_field.text.toString()
-                , true
-            )
+            computeConvertedBalance(true)
         }
+    }
+
+    fun computeConvertedBalance(isInitial: Boolean) {
+        viewModel.computeConvertedBalance(
+            currency_lbl.text.toString(),
+            currency_receive_lbl.text.toString(),
+            balancesAdapter.getBaseBalance(currency_lbl.text.toString()),
+            sell_field.text.toString()
+            , isInitial
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -104,8 +108,9 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
                 balancesAdapter.updateDataSet(result)
             })
 
-            dialogMessage.observe(viewLifecycleOwner, Observer { message ->
-                submitDialog(message)
+            dialogMessage.observe(viewLifecycleOwner, Observer { dialogContentItem ->
+                val startMessage = dialogContentItem?.startMessage?.let { getString(it) }
+                showAlertDialog(dialogContentItem?.title, "$startMessage ${dialogContentItem?.endMessage}", dialogContentItem?.tag, dialogContentItem?.isDone)
             })
 
             currencyReceive.observe(viewLifecycleOwner, Observer { receive ->
@@ -128,19 +133,6 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         } else {
             currency_lbl.text = selected
         }
-    }
-
-    /**
-     * Update UI after dialog confirmation and continue the conversion.
-     */
-    override fun updateBalanceUI() {
-        viewModel.computeConvertedBalance(
-            currency_lbl.text.toString(),
-            currency_receive_lbl.text.toString(),
-            balancesAdapter.getBaseBalance(currency_lbl.text.toString()),
-            sell_field.text.toString()
-            , false
-        )
     }
 
     override fun onAttach(context: Context) {
@@ -166,13 +158,19 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
      * */
     interface OnCurrencyFragmentListener {
         /**
-         * Function to handle callback to show progress bar .
+         * Function to handle callback to show progress bar.
          * */
         fun showProgressBar()
 
         /**
-         * Function to handle callback to hide progress bar .
+         * Function to handle callback to hide progress bar.
          * */
         fun hideProgressBar()
+    }
+
+    private fun showAlertDialog(alertTitle: String?, alertMessage: String?, tag: String?, isDone: Boolean?) {
+        var alertDialogFragment = AlertDialogFragment.newInstance(alertTitle, alertMessage, isDone)
+        alertDialogFragment.setTargetFragment(this, 0)
+        activity?.supportFragmentManager?.let { alertDialogFragment.show(it, tag) }
     }
 }

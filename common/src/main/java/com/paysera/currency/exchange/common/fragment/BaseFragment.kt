@@ -113,7 +113,7 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
      *  @param currencies list of currencies
      *  @param if dialog shown from receive cta.
      */
-    fun showDialog(currencies: ArrayList<String?>, isReceive: Boolean) {
+    fun showDialog(currencies: MutableList<String?>, isReceive: Boolean) {
         var selected: String? = ""
         val listItems = currencies.toTypedArray<CharSequence?>()
         val mBuilder = context?.let { AlertDialog.Builder(it) }
@@ -129,52 +129,6 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         // Set the neutral/cancel button click listener
         mBuilder?.setNegativeButton(R.string.cancel) { dialog, which ->
             // Do something when click the neutral button
-            dialog.cancel()
-            which.or(-2)
-        }
-        val mDialog = mBuilder?.create()
-        mDialog?.show()
-    }
-
-    /**
-     *  Update the remaining balance after the convertion.
-     */
-    abstract fun updateBalanceUI()
-
-    /**
-     *  Show the submitted dialog when converting currencies.
-     */
-    fun submitDialog(message: String?) {
-        val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setMessage("${getString(R.string.are_you_sure_dialog)} $message")
-        mBuilder?.setPositiveButton(R.string.yes) {dialog, which  ->
-            confirmationDialog(message)
-            updateBalanceUI()
-            dialog.cancel()
-            which.or(-1)
-        }
-        // Set the neutral/cancel button click listener
-        mBuilder?.setNegativeButton(R.string.no) { dialog, which ->
-            dialog.cancel()
-            which.or(-2)
-        }
-        val mDialog = mBuilder?.create()
-        mDialog?.show()
-    }
-
-    /**
-     *  Show the confirmation dialog after the conversion.
-     */
-    private fun confirmationDialog(message: String?) {
-        val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setTitle(getString(R.string.currency_converted))
-        mBuilder?.setMessage("${getString(R.string.you_have_converted)} $message")
-        mBuilder?.setPositiveButton(R.string.ok) {dialog, which  ->
-            dialog.cancel()
-            which.or(-1)
-        }
-        // Set the neutral/cancel button click listener
-        mBuilder?.setNegativeButton(R.string.cancel) { dialog, which ->
             dialog.cancel()
             which.or(-2)
         }
