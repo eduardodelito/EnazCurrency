@@ -98,10 +98,8 @@ knowledge of best practices, design & architecture patterns
 
 # Major libraries
  * Kotlin
- * Android Architecture Components (ViewModel, LiveData, Room, Coroutines, Data Binding)
- * Navigation
+ * Android Architecture Components (ViewModel, LiveData, Room, Data Binding)
  * Retrofit
- * Picasso
  * Dagger2
  * RxJava
  
