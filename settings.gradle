@@ -1,2 +1,2 @@
 include ':app', ':appdb', ':common', ':payseraclient', ':payseraui'
-rootProject.name='Paysera'
+rootProject.name='EnazCurrency'

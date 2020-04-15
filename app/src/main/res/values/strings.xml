@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Paysera</string>
+    <string name="app_name">EnazCurrency</string>
     <string name="dialog_title">Please wait...</string>
     <string name="reset">Reset</string>
 </resources>
