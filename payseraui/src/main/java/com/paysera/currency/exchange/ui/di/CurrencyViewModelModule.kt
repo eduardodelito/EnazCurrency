@@ -1,6 +1,5 @@
 package com.paysera.currency.exchange.ui.di
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.paysera.currency.exchange.client.repository.CurrencyRepository
 import com.paysera.currency.exchange.common.viewmodel.ViewModelKey

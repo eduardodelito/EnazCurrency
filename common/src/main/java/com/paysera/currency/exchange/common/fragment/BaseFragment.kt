@@ -103,36 +103,4 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel> : DaggerFrag
         super.onStop()
         viewModel.onStop()
     }
-    /**
-     *  Update the added balance on the list after the conversion.
-     */
-    abstract fun updateReceiveUI(selected: String?, isReceive: Boolean)
-
-    /**
-     *  Show dialog to select available currencies.
-     *  @param currencies list of currencies
-     *  @param if dialog shown from receive cta.
-     */
-    fun showDialog(currencies: MutableList<String?>, isReceive: Boolean) {
-        var selected: String? = ""
-        val listItems = currencies.toTypedArray<CharSequence?>()
-        val mBuilder = context?.let { AlertDialog.Builder(it) }
-        mBuilder?.setTitle(getString(R.string.choose_currencies_title))
-        mBuilder?.setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
-            dialogInterface.apply { selected = listItems[i].toString()}
-        }
-        mBuilder?.setPositiveButton(R.string.ok) {dialog, which  ->
-            updateReceiveUI(selected, isReceive)
-            dialog.cancel()
-            which.or(-1)
-        }
-        // Set the neutral/cancel button click listener
-        mBuilder?.setNegativeButton(R.string.cancel) { dialog, which ->
-            // Do something when click the neutral button
-            dialog.cancel()
-            which.or(-2)
-        }
-        val mDialog = mBuilder?.create()
-        mDialog?.show()
-    }
 }

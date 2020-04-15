@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.paysera.currency.exchange.common.dialog.Banner
@@ -12,6 +11,8 @@ import com.paysera.currency.exchange.common.dialog.ErrorBannerFragment
 import com.paysera.currency.exchange.common.fragment.BaseFragment
 import com.paysera.currency.exchange.ui.adapter.BalancesAdapter
 import com.paysera.currency.exchange.ui.databinding.CurrencyFragmentBinding
+import com.paysera.currency.exchange.ui.listener.CurrencyDialogListener
+import com.paysera.currency.exchange.ui.manager.CurrencyDialogManager
 import com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel
 import kotlinx.android.synthetic.main.currency_fragment.*
 import javax.inject.Inject
@@ -19,10 +20,14 @@ import javax.inject.Inject
 /**
  * Created by eduardo.delito on 3/11/20.
  */
-class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>() {
+class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>(),
+    CurrencyDialogListener {
 
     @Inject
     override lateinit var viewModel: CurrencyViewModel
+
+    @Inject
+    lateinit var currencyDialogManager: CurrencyDialogManager
 
     override fun createLayout() = R.layout.currency_fragment
 
@@ -51,10 +56,10 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         }
 
         drop_down_image.setOnClickListener {
-            showDialog(viewModel.currencies(), false)
+            currencyDialogManager.showDialog(context, this, viewModel.currencies(), false)
         }
         drop_down_receive_image.setOnClickListener {
-            showDialog(viewModel.currencies(), true)
+            currencyDialogManager.showDialog(context, this, viewModel.currencies(), true)
         }
         submit_button.setOnClickListener {
             computeConvertedBalance(true)
@@ -135,7 +140,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     }
 
     /**
-     * Update UI currency labels.
+     *  Update the currency label/added balance on the list after the conversion.
      */
     override fun updateReceiveUI(selected: String?, isReceive: Boolean) {
         if (isReceive) {
@@ -192,18 +197,19 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
 
     private fun showErrorBanner(index: Int?) {
         if (errorBannerFragment?.isVisible == true) return
-        val errorBannerListener: ErrorBannerFragment.ErrorBannerListener = object : ErrorBannerFragment.ErrorBannerListener {
-            override fun onErrorBannerRetry(tag: String?) {
-                //TODO: Do nothing
-            }
+        val errorBannerListener: ErrorBannerFragment.ErrorBannerListener =
+            object : ErrorBannerFragment.ErrorBannerListener {
+                override fun onErrorBannerRetry(tag: String?) {
+                    //TODO: Do nothing
+                }
 
-            override fun onErrorBannerDismiss(tag: String?) {
-                //TODO: Do nothing
+                override fun onErrorBannerDismiss(tag: String?) {
+                    //TODO: Do nothing
+                }
             }
-        }
         var message: String?
 
-        when(index) {
+        when (index) {
             1 -> {
                 message = getString(R.string.dialog_the_same_currency)
             }
