@@ -56,7 +56,7 @@ Response example:
   "date": "2020-03-27"
 }
 
-Requirements
+# Requirements
 the task must be done in Kotlin
 there are no strict restrictions on time
 third-party libraries, tools, frameworks can be used
@@ -75,3 +75,32 @@ code quality
 knowledge of Android ecosystem - libraries, frameworks
 knowledge of best practices, design & architecture patterns
 (insanely) great UI/UX is an advantage
+
+# Design Pattern
+
+ **MVVM Kotlin**
+
+ 1. **Increases the "Blendability" of your views** (ability to use Expression Blend to design views). This enables a separation of responsibilities on teams that are lucky enough to have a designer and a programmer... each can work independent of the other.
+ 2. **"Lookless" view logic.** Views are agnostic from the code that runs behind them, enabling the same view logic to be reused across multiple views or have a view easily retooled or replaced. Seperates concerns between "behavior" and "style".
+ 3. **No duplicated code to update views.** In code-behind you will see a lot of calls to "myLabel.Text = newValue" sprinkled everywhere. With MVVM you can be assured the view is updated appropriately just by setting the underlying property and all view side-effects thereof.
+ 4. **Testability.** Since your logic is completely agnostic of your view (no "myLabel.Text" references), unit testing is made easy. You can test the behavior of a ViewModel without involving its view. This also enabled test-driven development of view behavior, which is almost impossible using code-behind.
+
+
+# Setup
+ * Create new empty project.
+ * Add required dependencies for this project that shown below.
+ * Used Dagger2 for injection.
+ * Used Rxjava for Observable, AndroidSchedulers, Schedulers.
+ * Used Room database to store data from the response. 
+ * When connection is gone load data from database.
+ * Used LiveData for displaying movie list in the RecyclerView.
+ * From Recycler view, used DataBinding to minimize coding.
+
+# Major libraries
+ * Kotlin
+ * Android Architecture Components (ViewModel, LiveData, Room, Data Binding)
+ * Retrofit
+ * Dagger2
+ * RxJava
+ 
+
