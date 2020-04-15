@@ -67,7 +67,7 @@ class CurrencyViewModel @Inject constructor(
             .subscribe(
                 {
                     if (it?.rates.toString().isNullOrEmpty())
-                        _errorMessage.postValue(R.string.error_network_connection)
+                        _errorMessage.postValue(5)
                     if (!isUILoaded) {
                         var list = currencyRepository.currencyList()
                         currencyRepository.loadBase(
@@ -83,7 +83,7 @@ class CurrencyViewModel @Inject constructor(
                     payseraResponseDisposable?.safeDispose()
                 },
                 {
-                    _errorMessage.postValue(R.string.error_network_connection)
+                    _errorMessage.postValue(5)
                     payseraResponseDisposable?.safeDispose()
                 }
             )
@@ -142,11 +142,20 @@ class CurrencyViewModel @Inject constructor(
             currencyEntity.currency.equals(fromCurrency)
         }?.maxConversion?.toDouble() ?: 0.0
 
-
-        if (toBal > fromBal || toBal == 0.0 || fromCurrency.equals(toCurrency) || list.isEmpty() || fromBal > maxConversion) {
-            _errorMessage.postValue(R.string.invalid_message)
+        if (fromCurrency.equals(toCurrency)) {
+            _errorMessage.postValue(1)
+            return
+        } else if (toBal > fromBal || fromBal > maxConversion) {
+            _errorMessage.postValue(2)
+            return
+        } else if (toBal == 0.0) {
+            _errorMessage.postValue(3)
+            return
+        } else if(list.isEmpty()) {
+            _errorMessage.postValue(4)
             return
         }
+
         computeDisposable = currencyRepository.queryCurrencies()
             .subscribe(
                 { result ->
@@ -159,7 +168,7 @@ class CurrencyViewModel @Inject constructor(
                     // Check if selected amount is greater than base balance to convert.
                     // If true, return an invalid message.
                     if (toBal > fromBaseBalance?.currencyBalance?.toDoubleOrNull() ?: 0.0) {
-                        _errorMessage.postValue(R.string.invalid_message)
+                        _errorMessage.postValue(1)
                     } else {
 
                         val totalFromBaseBalance =
@@ -201,9 +210,18 @@ class CurrencyViewModel @Inject constructor(
                         val commissionFeeMessage =
                             if (totalValueLimit >= currencyRepository.commissionFeeLimit())
                                 "Commission Fee - $commissionFee% $fromCurrency." else ""
-                        val message = "$toBal $fromCurrency to $computedWithCommissionFee $toCurrency"
+                        val message =
+                            "$toBal $fromCurrency to $computedWithCommissionFee $toCurrency"
                         if (initial) {
-                            _dialogMessage.postValue(DialogContentItem("Confirmation", R.string.are_you_sure_dialog, " $message? $commissionFeeMessage", "alertInitial", false))
+                            _dialogMessage.postValue(
+                                DialogContentItem(
+                                    "Confirmation",
+                                    R.string.are_you_sure_dialog,
+                                    " $message? $commissionFeeMessage",
+                                    "alertInitial",
+                                    false
+                                )
+                            )
                         } else {
 
                             // Update DB for base currency.
@@ -223,7 +241,11 @@ class CurrencyViewModel @Inject constructor(
 
                                 val limit = toBaseBalance.transactionCount.plus(1)
 
-                                _currencyReceive.postValue(convertDoubleToBigDecimal(computedWithCommissionFee))
+                                _currencyReceive.postValue(
+                                    convertDoubleToBigDecimal(
+                                        computedWithCommissionFee
+                                    )
+                                )
                                 // Update DB for the converted currency.
                                 currencyRepository.insertOrUpdate(
                                     CurrencyRatesResult(
@@ -235,7 +257,11 @@ class CurrencyViewModel @Inject constructor(
                                     ).serviceModelToCurrency()
                                 )
                             } else {
-                                _currencyReceive.postValue(convertDoubleToBigDecimal(computedWithCommissionFee))
+                                _currencyReceive.postValue(
+                                    convertDoubleToBigDecimal(
+                                        computedWithCommissionFee
+                                    )
+                                )
                                 currencyRepository.insertOrUpdate(
                                     CurrencyRatesResult(
                                         selectedCurrBal?.currency,
@@ -246,14 +272,22 @@ class CurrencyViewModel @Inject constructor(
                                     ).serviceModelToCurrency()
                                 )
                             }
-                            _dialogMessage.postValue(DialogContentItem("Congratulations", R.string.you_have_converted, " $message. $commissionFeeMessage", "alertDone", true))
+                            _dialogMessage.postValue(
+                                DialogContentItem(
+                                    "Congratulations",
+                                    R.string.you_have_converted,
+                                    " $message. $commissionFeeMessage",
+                                    "alertDone",
+                                    true
+                                )
+                            )
                             _isComputing.postValue(false)
                         }
                     }
                     computeDisposable?.safeDispose()
                 },
                 {
-                    _errorMessage.postValue(R.string.error_database)
+                    _errorMessage.postValue(6)
                     computeDisposable?.safeDispose()
                 })
     }
@@ -297,7 +331,7 @@ class CurrencyViewModel @Inject constructor(
                 parseBalanceList(result)
                 updateDisposable?.safeDispose()
             }, {
-                _errorMessage.postValue(R.string.error_database)
+                _errorMessage.postValue(6)
                 updateDisposable?.safeDispose()
             })
     }

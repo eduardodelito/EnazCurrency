@@ -16,4 +16,9 @@
     <string name="no">No</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
+
+    <string name="common_no_internet_connection">Weak or No Internet Connection.</string>
+
+    <string name="error_banner_dismiss_button">Dismiss Alert</string>
+    <string name="error_banner_retry_button">Retry</string>
 </resources>

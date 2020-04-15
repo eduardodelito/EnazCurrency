@@ -8,4 +8,10 @@
     <string name="label_sell">Sell</string>
     <string name="label_receive">Receive</string>
     <string name="label_submit">Submit</string>
+
+    <!--Dialog message-->
+    <string name="dialog_not_enough">Not enough balance.</string>
+    <string name="dialog_no_selected_amount">No selected amount.</string>
+    <string name="dialog_the_same_currency">Selected the same currency.</string>
+    <string name="dialog_empty_currency">Empty currencies. Please refresh.</string>
 </resources>

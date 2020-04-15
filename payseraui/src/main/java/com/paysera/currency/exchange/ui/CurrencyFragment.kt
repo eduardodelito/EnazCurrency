@@ -5,13 +5,15 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.paysera.currency.exchange.common.dialog.Banner
+import com.paysera.currency.exchange.common.dialog.ErrorBannerFragment
 import com.paysera.currency.exchange.common.fragment.BaseFragment
 import com.paysera.currency.exchange.ui.adapter.BalancesAdapter
 import com.paysera.currency.exchange.ui.databinding.CurrencyFragmentBinding
 import com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel
 import kotlinx.android.synthetic.main.currency_fragment.*
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import javax.inject.Inject
 
 /**
@@ -29,6 +31,10 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     private lateinit var balancesAdapter: BalancesAdapter
 
     private var mListener: OnCurrencyFragmentListener? = null
+
+    private val TAG: String = CurrencyFragment::class.java.simpleName
+
+    private var errorBannerFragment: ErrorBannerFragment? = null
 
     override fun initData() {
         mListener?.showProgressBar()
@@ -97,7 +103,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         with(viewModel) {
 
             errorMessage.observe(viewLifecycleOwner, Observer { messageId ->
-                Toast.makeText(context, messageId?.let { getString(it) }, Toast.LENGTH_LONG).show()
+                showErrorBanner(messageId)
             })
 
             isComputing.observe(viewLifecycleOwner, Observer { isComputing ->
@@ -110,7 +116,12 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
 
             dialogMessage.observe(viewLifecycleOwner, Observer { dialogContentItem ->
                 val startMessage = dialogContentItem?.startMessage?.let { getString(it) }
-                showAlertDialog(dialogContentItem?.title, "$startMessage ${dialogContentItem?.endMessage}", dialogContentItem?.tag, dialogContentItem?.isDone)
+                showAlertDialog(
+                    dialogContentItem?.title,
+                    "$startMessage ${dialogContentItem?.endMessage}",
+                    dialogContentItem?.tag,
+                    dialogContentItem?.isDone
+                )
             })
 
             currencyReceive.observe(viewLifecycleOwner, Observer { receive ->
@@ -168,9 +179,64 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         fun hideProgressBar()
     }
 
-    private fun showAlertDialog(alertTitle: String?, alertMessage: String?, tag: String?, isDone: Boolean?) {
+    private fun showAlertDialog(
+        alertTitle: String?,
+        alertMessage: String?,
+        tag: String?,
+        isDone: Boolean?
+    ) {
         var alertDialogFragment = AlertDialogFragment.newInstance(alertTitle, alertMessage, isDone)
         alertDialogFragment.setTargetFragment(this, 0)
         activity?.supportFragmentManager?.let { alertDialogFragment.show(it, tag) }
+    }
+
+    private fun showErrorBanner(index: Int?) {
+        if (errorBannerFragment?.isVisible == true) return
+        val errorBannerListener: ErrorBannerFragment.ErrorBannerListener = object : ErrorBannerFragment.ErrorBannerListener {
+            override fun onErrorBannerRetry(tag: String?) {
+                //TODO: Do nothing
+            }
+
+            override fun onErrorBannerDismiss(tag: String?) {
+                //TODO: Do nothing
+            }
+        }
+        var message: String?
+
+        when(index) {
+            1 -> {
+                message = getString(R.string.dialog_the_same_currency)
+            }
+            2 -> {
+                message = getString(R.string.dialog_not_enough)
+            }
+            3 -> {
+                message = getString(R.string.dialog_no_selected_amount)
+            }
+            4 -> {
+                message = getString(R.string.dialog_empty_currency)
+            }
+            5 -> {
+                message = getString(R.string.error_network_connection)
+            }
+            6 -> {
+                message = getString(R.string.error_database)
+            }
+            else -> {
+                message = getString(R.string.error_network_connection)
+            }
+        }
+
+        val bannerBuilder: Banner.Builder = Banner.from(message, activity)
+            .cancelable()
+            .transactional()
+            .modal()
+            .addListener(errorBannerListener)
+
+        errorBannerFragment = bannerBuilder.build()
+        errorBannerFragment?.show(
+            childFragmentManager,
+            TAG
+        )
     }
 }

@@ -70,7 +70,11 @@ class AlertDialogFragment : DialogFragment() {
          * Create a new instance of CurrencyDialogFragment, providing "num" as an
          * argument.
          */
-        fun newInstance(alertTitle: String?, content: String?, isDone: Boolean?): AlertDialogFragment {
+        fun newInstance(
+            alertTitle: String?,
+            content: String?,
+            isDone: Boolean?
+        ): AlertDialogFragment {
             val alertDialogFragment = AlertDialogFragment()
 
             // Supply num input as an argument.

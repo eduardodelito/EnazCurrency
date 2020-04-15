@@ -3,4 +3,10 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <!-- Error Banner -->
+    <color name="banner_orange">#ff4606</color>
+    <color name="banner_dark_blue">#FF243A55</color>
+    <color name="banner_active_blue">#FF1994D7</color>
+    <color name="banner_green">#FF61941B</color>
 </resources>

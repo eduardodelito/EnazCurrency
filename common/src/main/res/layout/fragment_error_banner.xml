@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@color/banner_dark_blue"
+    android:minHeight="80dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="8dp">
+
+
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/refresh_banner_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/error_banner_retry_button"
+            android:importantForAccessibility="yes"
+            android:src="@drawable/ic_refresh" />
+
+        <ImageButton
+            android:id="@+id/dismiss_banner_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/error_banner_dismiss_button"
+            android:importantForAccessibility="yes"
+            android:src="@drawable/ic_close_white" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/banner_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="@dimen/label_margin_20"
+        android:layout_marginBottom="@dimen/label_margin_20"
+        android:layout_toLeftOf="@+id/button_container"
+        android:importantForAccessibility="yes"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/banner_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:maxLines="2"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/banner_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="all"
+            android:importantForAccessibility="no"
+            android:textColor="@color/design_default_color_background"
+            android:textStyle="normal"
+            android:textSize="@dimen/text_size_18"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

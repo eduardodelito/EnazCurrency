@@ -2,6 +2,7 @@ import dependencies.*
 
 apply from: "$rootDir/android-module-base.gradle"
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion Versions.compileSdk
@@ -27,4 +28,8 @@ android {
     dataBinding {
         enabled = true
     }
+}
+
+dependencies {
+    implementation 'androidx.legacy:legacy-support-v4:+'
 }
