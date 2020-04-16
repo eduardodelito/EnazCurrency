@@ -12,5 +12,5 @@ interface CurrencyDialogManager {
      *  @param currencies list of currencies
      *  @param if dialog shown from receive cta.
      */
-    fun showDialog(context: Context?, currencyDialogListener: CurrencyDialogListener?, currencies: MutableList<String?>, isReceive: Boolean)
+    fun showDialog(context: Context?, currencyDialogListener: CurrencyDialogListener?, currencies: List<String?>, isReceive: Boolean)
 }

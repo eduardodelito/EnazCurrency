@@ -71,8 +71,8 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             currency_lbl.text.toString(),
             currency_receive_lbl.text.toString(),
             balancesAdapter.getBaseBalance(currency_lbl.text.toString()),
-            sell_field.text.toString()
-            , isInitial
+            sell_field.text.toString(),
+            isInitial
         )
     }
 
@@ -207,30 +207,15 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
                     //TODO: Do nothing
                 }
             }
-        var message: String?
 
-        when (index) {
-            1 -> {
-                message = getString(R.string.dialog_the_same_currency)
-            }
-            2 -> {
-                message = getString(R.string.dialog_not_enough)
-            }
-            3 -> {
-                message = getString(R.string.dialog_no_selected_amount)
-            }
-            4 -> {
-                message = getString(R.string.dialog_empty_currency)
-            }
-            5 -> {
-                message = getString(R.string.error_network_connection)
-            }
-            6 -> {
-                message = getString(R.string.error_database)
-            }
-            else -> {
-                message = getString(R.string.error_network_connection)
-            }
+        var message = when (index) {
+            1 -> getString(R.string.dialog_the_same_currency)
+            2 -> getString(R.string.dialog_not_enough)
+            3 -> getString(R.string.dialog_no_selected_amount)
+            4 -> getString(R.string.dialog_empty_currency)
+            5 -> getString(R.string.error_network_connection)
+            6 -> getString(R.string.error_database)
+            else -> getString(R.string.error_network_connection)
         }
 
         val bannerBuilder: Banner.Builder = Banner.from(message, activity)

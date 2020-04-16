@@ -1,7 +1,7 @@
 package com.paysera.currency.exchange.client
 
 import com.paysera.currency.exchange.client.model.PayseraResponse
-import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.http.GET
 
 /**
@@ -9,6 +9,6 @@ import retrofit2.http.GET
  */
 interface PayseraApiService {
     @GET("latest/")
-    fun getCurrencies(): Observable<PayseraResponse>
+    fun getCurrencies(): Single<PayseraResponse>
 
 }

@@ -8,7 +8,8 @@ import com.paysera.currency.exchange.client.serviceModelToCurrencyEntity
 import com.paysera.currency.exchange.common.util.safeDispose
 import com.paysera.currency.exchange.db.dao.CurrencyDao
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
-import io.reactivex.Observable
+import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -19,15 +20,15 @@ import org.json.JSONObject
  */
 interface CurrencyRepository {
 
-    fun getPayseraResponse(): Observable<PayseraResponse>
+    fun getPayseraResponse(): Single<PayseraResponse>
 
     fun deleteCurrencies()
 
-    fun queryCurrencies(): Observable<List<CurrencyEntity>>
+    fun queryCurrencies(): Single<List<CurrencyEntity>>
 
     fun currencyList(): List<CurrencyEntity>
 
-    fun currencies(): ArrayList<String?>
+    fun currencies(): List<String?>
 
     fun insertOrUpdate(currency: CurrencyEntity)
 
@@ -44,18 +45,18 @@ class CurrencyRepositoryImpl(
     private var queryCurrenciesDisposable: Disposable? = null
     private var deleteCurrencyDisposable: Disposable? = null
     private var insertCurrencyDisposable: Disposable? = null
-    private var currencyList = ArrayList<CurrencyRatesResult>()
-    private var mCurrencies = ArrayList<String?>()
+    private var currencyList = mutableListOf<CurrencyRatesResult>()
+    private var mCurrencies = mutableListOf<String?>()
     private var limit = 0
 
     /**
      * Request to the Currency Exchange Rate API.
      */
-    override fun getPayseraResponse(): Observable<PayseraResponse> =
+    override fun getPayseraResponse(): Single<PayseraResponse> =
         apiClient.getService().getCurrencies()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {
+            .doAfterSuccess {
                 //Limit can get from the service pass it or save into database. ex. it?.limit
                 limit = 5
                 currencyListResult(it?.base, it?.rates)
@@ -84,7 +85,7 @@ class CurrencyRepositoryImpl(
     /**
      * Currency list store in the container.
      */
-    override fun currencies(): ArrayList<String?> = mCurrencies
+    override fun currencies(): List<String?> = mCurrencies
 
     override fun commissionFeeLimit(): Int {
         return limit
@@ -94,7 +95,7 @@ class CurrencyRepositoryImpl(
      * Delete currency list from the database
      */
     override fun deleteCurrencies() {
-        deleteCurrencyDisposable = Observable.fromCallable {
+        deleteCurrencyDisposable = Completable.fromCallable {
                 currencyDao.deleteCurrencies()
             }
             .subscribeOn(Schedulers.io())
@@ -107,7 +108,7 @@ class CurrencyRepositoryImpl(
      * @param base currency EUR.
      * @param rateList currencies and rates.
      */
-    private fun currencyListResult(base: String?, rateList: Any?): ArrayList<CurrencyRatesResult> {
+    private fun currencyListResult(base: String?, rateList: Any?): List<CurrencyRatesResult> {
         val jObject = JSONObject(rateList.toString())
         val keys: Iterator<String> = jObject.keys()
         mCurrencies.clear()
@@ -134,7 +135,7 @@ class CurrencyRepositoryImpl(
     /**
      * Query currency list from the database.
      */
-    override fun queryCurrencies(): Observable<List<CurrencyEntity>> =
+    override fun queryCurrencies(): Single<List<CurrencyEntity>> =
         currencyDao.getAllCurrencies().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
@@ -143,7 +144,7 @@ class CurrencyRepositoryImpl(
      * @param currency item CurrencyEntity
      */
     override fun insertOrUpdate(currency: CurrencyEntity) {
-        insertCurrencyDisposable = Observable.fromCallable {
+        insertCurrencyDisposable = Completable.fromCallable {
                 currencyDao.insertOrUpdate(currency)
             }
             .subscribeOn(Schedulers.io())

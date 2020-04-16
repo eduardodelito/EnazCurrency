@@ -21,7 +21,7 @@ class CurrencyDialogManagerImpl @Inject constructor() : CurrencyDialogManager {
     override fun showDialog(
         context: Context?,
         currencyDialogListener: CurrencyDialogListener?,
-        currencies: MutableList<String?>,
+        currencies: List<String?>,
         isReceive: Boolean
     ) {
         var selected: String? = ""

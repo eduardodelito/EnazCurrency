@@ -70,15 +70,17 @@ class CurrencyViewModel @Inject constructor(
                         _errorMessage.postValue(5)
                     if (!isUILoaded) {
                         var list = currencyRepository.currencyList()
-                        currencyRepository.loadBase(
-                            CurrencyRatesResult(
-                                list[0].currency,
-                                list[0].currencyValue,
-                                list[0].currencyBalance,
-                                list[0].maxConversion,
-                                list[0].transactionCount
+                        if (list.isNotEmpty()) {
+                            currencyRepository.loadBase(
+                                CurrencyRatesResult(
+                                    list[0].currency,
+                                    list[0].currencyValue,
+                                    list[0].currencyBalance,
+                                    list[0].maxConversion,
+                                    list[0].transactionCount
+                                )
                             )
-                        )
+                        }
                     }
                     payseraResponseDisposable?.safeDispose()
                 },
@@ -114,7 +116,7 @@ class CurrencyViewModel @Inject constructor(
     /**
      * Currency list store in the container.
      */
-    fun currencies(): ArrayList<String?> {
+    fun currencies(): List<String?> {
         return currencyRepository.currencies()
     }
 
@@ -340,7 +342,7 @@ class CurrencyViewModel @Inject constructor(
      * Parse list from from db.
      */
     private fun parseBalanceList(result: List<CurrencyEntity>) {
-        var list: MutableList<BalanceItem> = ArrayList()
+        var list = mutableListOf<BalanceItem>()
         result.forEach { currencyEntity: CurrencyEntity ->
             list.add(
                 BalanceItem(

@@ -13,7 +13,7 @@ import com.paysera.currency.exchange.ui.model.BalanceItem
  */
 class BalancesAdapter: RecyclerView.Adapter<BalancesAdapter.TrackViewHolder>() {
 
-    private var list: MutableList<BalanceItem> = ArrayList()
+    private var list = mutableListOf<BalanceItem>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding: ItemBalanceBinding =
