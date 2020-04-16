@@ -39,16 +39,16 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
 
     private lateinit var balancesAdapter: BalancesAdapter
 
-    private var mListener: OnCurrencyFragmentListener? = null
-
     private var currencyFragmentDialogListener: CurrencyFragmentDialogListener? = null
 
     private val TAG: String = CurrencyFragment::class.java.simpleName
 
     private var errorBannerFragment: ErrorBannerFragment? = null
 
+    private var progressDialog: ProgressDialogFragment? = null
+
     override fun initData() {
-        mListener?.showProgressBar()
+        showProgressDialog()
         viewModel.requestCurrencies()
     }
 
@@ -98,7 +98,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         // Handle presses on the action bar menu items
         when (item.itemId) {
             R.id.action_reset -> {
-                mListener?.showProgressBar()
+                showProgressDialog()
                 viewModel.deleteData()
                 receive_text.text = "+ 0"
                 return true
@@ -141,7 +141,7 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
             })
 
             isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-                if (!isLoading) mListener?.hideProgressBar()
+                if (!isLoading) progressDialog?.dismiss()
             })
         }
     }
@@ -172,30 +172,16 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnCurrencyFragmentListener) {
-            mListener = context
+        if (context is CurrencyFragmentDialogListener) {
+            currencyFragmentDialogListener = context
         }
     }
 
     override fun onDetach() {
         super.onDetach()
-        mListener = null
+        currencyFragmentDialogListener = null
+        progressDialog?.dismiss()
         viewModel.requestCurrenciesDispose()
-    }
-
-    /**
-     * Interface to handle callbacks
-     * */
-    interface OnCurrencyFragmentListener {
-        /**
-         * Function to handle callback to show progress bar.
-         * */
-        fun showProgressBar()
-
-        /**
-         * Function to handle callback to hide progress bar.
-         * */
-        fun hideProgressBar()
     }
 
     private fun showAlertDialog(
@@ -207,6 +193,11 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         var alertDialogFragment = AlertDialogFragment.newInstance(alertTitle, alertMessage, isDone)
         alertDialogFragment.setTargetFragment(this, 0)
         activity?.supportFragmentManager?.let { alertDialogFragment.show(it, tag) }
+    }
+
+    private fun showProgressDialog() {
+        progressDialog = ProgressDialogFragment.newInstance()
+        activity?.supportFragmentManager?.let { progressDialog?.show(it, "progress") }
     }
 
     companion object {
