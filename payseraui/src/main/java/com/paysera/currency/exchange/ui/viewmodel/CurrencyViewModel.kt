@@ -11,7 +11,7 @@ import com.paysera.currency.exchange.db.entity.CurrencyEntity
 import com.paysera.currency.exchange.ui.R
 import com.paysera.currency.exchange.ui.model.BalanceItem
 import com.paysera.currency.exchange.ui.model.DialogContentItem
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -97,7 +97,7 @@ class CurrencyViewModel @Inject constructor(
      */
     fun requestCurrencies() {
         requestCurrenciesDisposable =
-            Observable.timer(5, TimeUnit.SECONDS)
+            Single.timer(5, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .repeat()
                 .observeOn(AndroidSchedulers.mainThread())
