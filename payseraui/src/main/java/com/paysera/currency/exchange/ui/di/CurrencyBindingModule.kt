@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.paysera.currency.exchange.ui.CurrencyFragment
 import com.paysera.currency.exchange.ui.manager.CurrencyDialogManager
 import com.paysera.currency.exchange.ui.manager.CurrencyDialogManagerImpl
+import com.paysera.currency.exchange.ui.manager.ErrorBannerManager
+import com.paysera.currency.exchange.ui.manager.ErrorBannerManagerImpl
 import com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel
 import dagger.Module
 import dagger.Provides
@@ -18,7 +20,7 @@ abstract class CurrencyBindingModule {
 
     @ContributesAndroidInjector(
         modules = [
-            InjectCurrentExchangeViewModel::class, InjectCurrencyDialogManager::class
+            InjectCurrentExchangeViewModel::class, InjectCurrencyDialogManager::class, InjectErrorBannerManager::class
         ]
     )
     abstract fun bindCurrencyExchangeFragment(): CurrencyFragment
@@ -37,5 +39,12 @@ abstract class CurrencyBindingModule {
         @Provides
         internal fun provideCurrencyDialogManager(currencyDialogManagerImpl: CurrencyDialogManagerImpl): CurrencyDialogManager =
             currencyDialogManagerImpl
+    }
+
+    @Module
+    class InjectErrorBannerManager {
+        @Provides
+        internal fun provideErrorBannerManager(errorBannerManagerImpl: ErrorBannerManagerImpl): ErrorBannerManager =
+            errorBannerManagerImpl
     }
 }

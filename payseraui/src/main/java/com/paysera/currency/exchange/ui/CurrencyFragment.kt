@@ -11,8 +11,9 @@ import com.paysera.currency.exchange.common.dialog.ErrorBannerFragment
 import com.paysera.currency.exchange.common.fragment.BaseFragment
 import com.paysera.currency.exchange.ui.adapter.BalancesAdapter
 import com.paysera.currency.exchange.ui.databinding.CurrencyFragmentBinding
-import com.paysera.currency.exchange.ui.listener.CurrencyDialogListener
+import com.paysera.currency.exchange.ui.listener.CurrencyFragmentDialogListener
 import com.paysera.currency.exchange.ui.manager.CurrencyDialogManager
+import com.paysera.currency.exchange.ui.manager.ErrorBannerManager
 import com.paysera.currency.exchange.ui.viewmodel.CurrencyViewModel
 import kotlinx.android.synthetic.main.currency_fragment.*
 import javax.inject.Inject
@@ -21,13 +22,16 @@ import javax.inject.Inject
  * Created by eduardo.delito on 3/11/20.
  */
 class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel>(),
-    CurrencyDialogListener {
+    CurrencyFragmentDialogListener {
 
     @Inject
     override lateinit var viewModel: CurrencyViewModel
 
     @Inject
     lateinit var currencyDialogManager: CurrencyDialogManager
+
+    @Inject
+    lateinit var errorBannerManager: ErrorBannerManager
 
     override fun createLayout() = R.layout.currency_fragment
 
@@ -36,6 +40,8 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
     private lateinit var balancesAdapter: BalancesAdapter
 
     private var mListener: OnCurrencyFragmentListener? = null
+
+    private var currencyFragmentDialogListener: CurrencyFragmentDialogListener? = null
 
     private val TAG: String = CurrencyFragment::class.java.simpleName
 
@@ -105,10 +111,11 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
      * Subscribe view model via observer.
      */
     override fun subscribeUi() {
+        currencyFragmentDialogListener = this
         with(viewModel) {
 
             errorMessage.observe(viewLifecycleOwner, Observer { messageId ->
-                showErrorBanner(messageId)
+                errorBannerManager.showErrorBanner(messageId, context, activity, currencyFragmentDialogListener)
             })
 
             isComputing.observe(viewLifecycleOwner, Observer { isComputing ->
@@ -151,6 +158,18 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         }
     }
 
+    /**
+     *  Show error banner listener
+     *  @param bannerBuilder builder
+     */
+    override fun showErrorBanner(bannerBuilder: Banner.Builder) {
+        errorBannerFragment = bannerBuilder.build()
+        errorBannerFragment?.show(
+            childFragmentManager,
+            TAG
+        )
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnCurrencyFragmentListener) {
@@ -162,11 +181,6 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         super.onDetach()
         mListener = null
         viewModel.requestCurrenciesDispose()
-    }
-
-    companion object {
-        fun newInstance() =
-            CurrencyFragment()
     }
 
     /**
@@ -195,39 +209,8 @@ class CurrencyFragment : BaseFragment<CurrencyFragmentBinding, CurrencyViewModel
         activity?.supportFragmentManager?.let { alertDialogFragment.show(it, tag) }
     }
 
-    private fun showErrorBanner(index: Int?) {
-        if (errorBannerFragment?.isVisible == true) return
-        val errorBannerListener: ErrorBannerFragment.ErrorBannerListener =
-            object : ErrorBannerFragment.ErrorBannerListener {
-                override fun onErrorBannerRetry(tag: String?) {
-                    //TODO: Do nothing
-                }
-
-                override fun onErrorBannerDismiss(tag: String?) {
-                    //TODO: Do nothing
-                }
-            }
-
-        var message = when (index) {
-            1 -> getString(R.string.dialog_the_same_currency)
-            2 -> getString(R.string.dialog_not_enough)
-            3 -> getString(R.string.dialog_no_selected_amount)
-            4 -> getString(R.string.dialog_empty_currency)
-            5 -> getString(R.string.error_network_connection)
-            6 -> getString(R.string.error_database)
-            else -> getString(R.string.error_network_connection)
-        }
-
-        val bannerBuilder: Banner.Builder = Banner.from(message, activity)
-            .cancelable()
-            .transactional()
-            .modal()
-            .addListener(errorBannerListener)
-
-        errorBannerFragment = bannerBuilder.build()
-        errorBannerFragment?.show(
-            childFragmentManager,
-            TAG
-        )
+    companion object {
+        fun newInstance() =
+            CurrencyFragment()
     }
 }
