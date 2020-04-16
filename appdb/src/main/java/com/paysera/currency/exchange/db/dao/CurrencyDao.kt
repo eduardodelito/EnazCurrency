@@ -2,7 +2,6 @@ package com.paysera.currency.exchange.db.dao
 
 import androidx.room.*
 import com.paysera.currency.exchange.db.entity.CurrencyEntity
-import io.reactivex.Observable
 import io.reactivex.Single
 
 /**

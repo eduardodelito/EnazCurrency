@@ -31,7 +31,7 @@ class ErrorBannerFragment : DialogFragment() {
     private var type: String? = null
     private lateinit var hierarchy: Banner.Hierarchy
 
-    private var listeners: MutableList<ErrorBannerListener>? = null
+    private var listeners: MutableList<ErrorBannerListener?>? = null
     private var withRetry: Boolean? = false
     private var retry = false
     private var disableAutoLink: Boolean? = false
@@ -200,8 +200,8 @@ class ErrorBannerFragment : DialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (listeners != null) {
-            for (listener in listeners!!) {
-                if (retry) listener.onErrorBannerRetry(tag) else listener.onErrorBannerDismiss(
+            listeners?.forEach { listener ->
+                if (retry) listener?.onErrorBannerRetry(tag) else listener?.onErrorBannerDismiss(
                     tag
                 )
             }
@@ -279,7 +279,8 @@ class ErrorBannerFragment : DialogFragment() {
         manager: FragmentManager,
         tag: String?
     ): Boolean {
-        if (isAdded || isVisible || activity != null && activity!!.isFinishing || manager.isDestroyed) {
+        val isFinishing = activity.let { it != null && it.isFinishing }
+        if (isAdded || isVisible || isFinishing || manager.isDestroyed) {
             return false
         }
         val transaction = manager.beginTransaction()

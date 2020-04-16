@@ -92,7 +92,7 @@ object Banner {
 
     private fun getCurrentBanner(): ErrorBannerFragment? {
         return if (currentBannerReference != null) {
-            currentBannerReference!!.get()
+            currentBannerReference?.get()
         } else null
     }
 
@@ -167,8 +167,8 @@ object Banner {
      *
      * @return
      */
-    fun fromNetworkError(activity: FragmentActivity?): Builder {
-        return from(activity!!.getString(R.string.common_no_internet_connection), activity)
+    private fun fromNetworkError(activity: FragmentActivity?): Builder {
+        return from(activity?.getString(R.string.common_no_internet_connection), activity)
             .setHierarchy(Hierarchy.NETWORK_ERROR)
             .setBannerType(BannerType.ERROR)
     }
@@ -194,7 +194,7 @@ object Banner {
             private set
         var isDisableAutoLink = false
             private set
-        private val listeners: MutableList<ErrorBannerFragment.ErrorBannerListener>
+        private val listeners: MutableList<ErrorBannerFragment.ErrorBannerListener?>
         val activity: FragmentActivity?
         var bannerType: BannerType? = null
             private set
@@ -274,7 +274,7 @@ object Banner {
             return this
         }
 
-        fun getListeners(): MutableList<ErrorBannerFragment.ErrorBannerListener> {
+        fun getListeners(): MutableList<ErrorBannerFragment.ErrorBannerListener?> {
             return listeners
         }
 
