@@ -110,14 +110,13 @@ class CurrencyRepositoryImpl(
      */
     private fun currencyListResult(base: String?, rateList: Any?): List<CurrencyRatesResult> {
         val jObject = JSONObject(rateList.toString())
-        val keys: Iterator<String> = jObject.keys()
         mCurrencies.clear()
         mCurrencies.add(base)
         currencyList.clear()
         // Max conversion can be modified from the service. Add default 1000.
         currencyList.add(CurrencyRatesResult(base, "1", "1000", "1000", 0))
-        while (keys.hasNext()) {
-            val key = keys.next()
+
+        jObject.keys().forEach { key ->
             mCurrencies.add(key)
             currencyList.add(
                 CurrencyRatesResult(
